@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// 作者
+model Author {
+  id Int @id @default(autoincrement())
+  name String
+  comics Comic[]
+}
+
+// 漫画
+model Comic {
+  id Int @id @default(autoincrement())
+  name String
+  author Author? @relation(fields: [authorId], references: [id])
+  authorId  Int?
+  publish String?
+  path String?
+  publishTime Int? 
+  cover String?
+  isReaded Boolean @default(false)  // 是否已读
+  chapters Chapter[]  // 章节
+  tags Tag[]
+}
+
+// 章节
+model Chapter{
+  id Int @id @default(autoincrement())
+  name String // 名称
+  dir String // 目录
+  type String @default("folder")
+  comic Comic @relation(fields: [comicId], references: [id])
+  comicId  Int
+}
+
+// 标签
+model Tag {
+  id Int @id @default(autoincrement())
+  name String // 名称
+  // comic Comic @relation(fields: [comicId], references: [id])
+  // comicId  Int
+  comics Comic[]
+}
+
+// 设置
+// model Config {
+//   id Int @id @default(autoincrement())
+//   key
+// }
