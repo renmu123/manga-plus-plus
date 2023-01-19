@@ -1,55 +1,63 @@
 import express from "express";
+import validator from "express-validator";
+import validate from "../utils/valid.js";
+import prisma from "../utils/db.js";
 
+const { body, param } = validator;
 const router = express.Router();
 
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
-
 // 添加路由
-router.post("/add", async (req, res) => {
-  const { name } = req.body;
+router.post("/add", validate([body("name").isString()]), async (req, res) => {
   const post = await prisma.chapter.create({
-    data: {
-      name,
-    },
+    data: req.body,
   });
   res.json(post);
 });
 
-router.post("/remove", async (req, res) => {
-  const { id } = req.body;
-  const post = await prisma.chapter.delete({
-    where: { id },
-  });
-  res.json(post);
-});
+router.post(
+  "/remove",
+  validate([body("id").isInt().toInt()]),
+  async (req, res) => {
+    const { id } = req.body;
+    const post = await prisma.chapter.delete({
+      where: { id },
+    });
+    res.json(post);
+  }
+);
 
-router.post("/edit", async (req, res) => {
-  const { id, name } = req.body;
-  const post = await prisma.chapter.update({
-    where: { id },
-    data: {
-      name,
-    },
-  });
-  res.json(post);
-});
+router.post(
+  "/edit",
+  validate([body("id").isInt().toInt()]),
+  async (req, res) => {
+    const { id } = req.body;
+    const post = await prisma.chapter.update({
+      where: { id },
+      data: req.body,
+    });
+    res.json(post);
+  }
+);
 
-router.get("/query", async (req, res) => {
-  const { id } = req.query;
-
-  if (id) {
+router.get(
+  "/query/:id",
+  validate([param("id").isInt().toInt()]),
+  async (req, res) => {
     const post = await prisma.chapter.findUnique({
       where: {
-        id: Number(id),
+        id: req.params.id,
+      },
+      include: {
+        comics: true,
       },
     });
     res.json(post);
-  } else {
-    const post = await prisma.chapter.findMany({});
-    res.json(post);
   }
+);
+
+router.get("/query", async (req, res) => {
+  const post = await prisma.chapter.findMany({});
+  res.json(post);
 });
 
 export default router;

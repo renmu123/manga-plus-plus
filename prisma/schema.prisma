@@ -17,12 +17,18 @@ model Author {
   comics Comic[]
 }
 
+model Library {
+  id Int @id @default(autoincrement())
+  name String
+  dir String
+  comics Comic[]
+}
+
 // 漫画
 model Comic {
   id Int @id @default(autoincrement())
   name String
-  author Author? @relation(fields: [authorId], references: [id])
-  authorId  Int?
+  authors Author[]
   publish String?
   path String?
   publishTime Int? 
@@ -30,6 +36,8 @@ model Comic {
   isReaded Boolean @default(false)  // 是否已读
   chapters Chapter[]  // 章节
   tags Tag[]
+  library Library? @relation(fields: [libraryId], references: [id])
+  libraryId  Int?
 }
 
 // 章节
@@ -46,8 +54,6 @@ model Chapter{
 model Tag {
   id Int @id @default(autoincrement())
   name String // 名称
-  // comic Comic @relation(fields: [comicId], references: [id])
-  // comicId  Int
   comics Comic[]
 }
 

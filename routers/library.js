@@ -1,4 +1,5 @@
 import express from "express";
+
 import validator from "express-validator";
 import validate from "../utils/valid.js";
 import prisma from "../utils/db.js";
@@ -6,22 +7,34 @@ import prisma from "../utils/db.js";
 const { body, param } = validator;
 const router = express.Router();
 
-router.post("/add", validate([body("name").isString()]), async (req, res) => {
-  const post = await prisma.tag.create({
-    data: req.body,
-  });
-  res.json(post);
-});
+router.post(
+  "/add",
+  validate([body("name").isString(), body("dir").isString()]),
+  async (req, res) => {
+    const post = await prisma.library.create({
+      data: req.body,
+    });
+    res.json(post);
+  }
+);
 
 router.post(
   "/remove",
   validate([body("id").isInt().toInt()]),
   async (req, res) => {
     const { id } = req.body;
-    const post = await prisma.tag.delete({
-      where: { id },
-    });
-    res.json(post);
+
+    await prisma.$transaction([
+      prisma.comic.deleteMany({
+        where: {
+          libraryId: id,
+        },
+      }),
+      prisma.library.delete({
+        where: { id },
+      }),
+    ]);
+    res.json({ success: true });
   }
 );
 
@@ -30,7 +43,7 @@ router.post(
   validate([body("id").isInt().toInt()]),
   async (req, res) => {
     const { id } = req.body;
-    const post = await prisma.tag.update({
+    const post = await prisma.library.update({
       where: { id },
       data: req.body,
     });
@@ -42,7 +55,7 @@ router.get(
   "/query/:id",
   validate([param("id").isInt().toInt()]),
   async (req, res) => {
-    const post = await prisma.tag.findUnique({
+    const post = await prisma.library.findUnique({
       where: {
         id: req.params.id,
       },
@@ -55,7 +68,7 @@ router.get(
 );
 
 router.get("/query", async (req, res) => {
-  const post = await prisma.tag.findMany({});
+  const post = await prisma.library.findMany({});
   res.json(post);
 });
 
