@@ -1,29 +1,23 @@
 import express from "express";
+import "express-async-errors";
+
 import cors from "cors";
 import morgan from "morgan";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
-import comicRouter from "./routers/comic.js";
-import authorRouter from "./routers/author.js";
-import chapterRouter from "./routers/chapter.js";
-import tagRouter from "./routers/tag.js";
-import libraryRouter from "./routers/library.js";
+import comicRouter from "./routes/comic.js";
+import authorRouter from "./routes/author.js";
+import chapterRouter from "./routes/chapter.js";
+import tagRouter from "./routes/tag.js";
+import libraryRouter from "./routes/library.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const hostname = "localhost";
 const port = 3000;
-
-const errorHandler = (error, request, response, next) => {
-  // Error handling middleware functionality
-  console.log(`error ${error.message}`); // log the error
-  const status = error.status || 400;
-  // send back an easily understandable error message to the caller
-  response.status(status).send(error.message);
-};
 
 const accessLogStream = fs.createWriteStream(
   path.join(__dirname, "access.log"),
@@ -45,7 +39,30 @@ app.get("/", (req, res) => {
   res.send("Hello World");
 });
 
+// Error handling Middleware function for logging the error message
+const errorLogger = (error, request, response, next) => {
+  console.log(`error ${error.message}`);
+  next(error); // calling next middleware
+};
+
+const errorHandler = (error, request, response, next) => {
+  // Error handling middleware functionality
+  console.log(`error ${error.message}`); // log the error
+  const status = error.status || 400;
+  // send back an easily understandable error message to the caller
+  response.status(status).json({ errors: [{ msg: error.message }] });
+};
+
+// Fallback Middleware function for returning
+// 404 error for undefined paths
+const invalidPathHandler = (request, response, next) => {
+  response.status(404);
+  response.send("invalid path");
+};
+
+app.use(errorLogger);
 app.use(errorHandler);
+app.use(invalidPathHandler);
 
 app.listen(port, () => {
   console.log(`Server running at http://${hostname}:${port}/`);

@@ -1,4 +1,6 @@
 import express from "express";
+import "express-async-errors";
+
 import fs from "fs/promises";
 import path from "path";
 import validator from "express-validator";

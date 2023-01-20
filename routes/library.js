@@ -1,4 +1,6 @@
 import express from "express";
+import "express-async-errors";
+
 import validator from "express-validator";
 import validate from "../utils/valid.js";
 import prisma from "../utils/db.js";
@@ -6,23 +8,34 @@ import prisma from "../utils/db.js";
 const { body, param } = validator;
 const router = express.Router();
 
-// 添加路由
-router.post("/add", validate([body("name").isString()]), async (req, res) => {
-  const post = await prisma.chapter.create({
-    data: req.body,
-  });
-  res.json(post);
-});
+router.post(
+  "/add",
+  validate([body("name").isString(), body("dir").isString()]),
+  async (req, res) => {
+    const post = await prisma.library.create({
+      data: req.body,
+    });
+    res.json(post);
+  }
+);
 
 router.post(
   "/remove",
   validate([body("id").isInt().toInt()]),
   async (req, res) => {
     const { id } = req.body;
-    const post = await prisma.chapter.delete({
-      where: { id },
-    });
-    res.json(post);
+
+    await prisma.$transaction([
+      prisma.comic.deleteMany({
+        where: {
+          libraryId: id,
+        },
+      }),
+      prisma.library.delete({
+        where: { id },
+      }),
+    ]);
+    res.json({ success: true });
   }
 );
 
@@ -31,7 +44,7 @@ router.post(
   validate([body("id").isInt().toInt()]),
   async (req, res) => {
     const { id } = req.body;
-    const post = await prisma.chapter.update({
+    const post = await prisma.library.update({
       where: { id },
       data: req.body,
     });
@@ -43,7 +56,7 @@ router.get(
   "/query/:id",
   validate([param("id").isInt().toInt()]),
   async (req, res) => {
-    const post = await prisma.chapter.findUnique({
+    const post = await prisma.library.findUnique({
       where: {
         id: req.params.id,
       },
@@ -56,7 +69,7 @@ router.get(
 );
 
 router.get("/query", async (req, res) => {
-  const post = await prisma.chapter.findMany({});
+  const post = await prisma.library.findMany({});
   res.json(post);
 });
 

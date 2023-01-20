@@ -1,7 +1,7 @@
 import validator from "express-validator";
 const { validationResult } = validator;
 
-// sequential processing, stops running validations chain if the previous one have failed.
+// sequential processing, stops running validations chxain if the previous one have failed.
 const validate = (validations) => {
   return async (req, res, next) => {
     for (let validation of validations) {
