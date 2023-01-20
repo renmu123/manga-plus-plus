@@ -123,7 +123,11 @@ const scanLibrary = async (libraryId) => {
         },
       });
       if (!post2) {
-        await chapterService.addChapter(data);
+        await chapterService.addChapter({
+          name: chapter.name,
+          comicId: post.id,
+          dir: chapter.dir,
+        });
       }
     }
   }
