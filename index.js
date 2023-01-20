@@ -7,11 +7,11 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
-import comicRouter from "./routes/comic.js";
-import authorRouter from "./routes/author.js";
-import chapterRouter from "./routes/chapter.js";
-import tagRouter from "./routes/tag.js";
-import libraryRouter from "./routes/library.js";
+import comicRouter from "./src/routes/comic.js";
+import authorRouter from "./src/routes/author.js";
+import chapterRouter from "./src/routes/chapter.js";
+import tagRouter from "./src/routes/tag.js";
+import libraryRouter from "./src/routes/library.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

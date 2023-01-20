@@ -7,7 +7,7 @@ import validator from "express-validator";
 import validate from "../utils/valid.js";
 import prisma from "../utils/db.js";
 
-const { body, param } = validator;
+const { body, param, query } = validator;
 const router = express.Router();
 
 // 添加路由
@@ -88,9 +88,9 @@ router.get("/query", async (req, res) => {
 
 router.get(
   "/scan",
-  validate([body("libraryId").isInt().toInt()]),
+  validate([query("libraryId").isInt().toInt()]),
   async (req, res) => {
-    const { libraryId } = req.query.libraryId;
+    const { libraryId } = req.query;
 
     const library = await prisma.library.findUnique({
       where: {
@@ -152,12 +152,14 @@ router.get(
       let post = await prisma.comic.findFirst({
         where: {
           name: name,
+          libraryId: libraryId,
         },
       });
       if (!post) {
         post = await prisma.comic.create({
           data: {
             name: name,
+            libraryId: libraryId,
           },
         });
       }

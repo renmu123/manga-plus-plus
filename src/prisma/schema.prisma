@@ -36,8 +36,8 @@ model Comic {
   isReaded Boolean @default(false)  // 是否已读
   chapters Chapter[]  // 章节
   tags Tag[]
-  library Library? @relation(fields: [libraryId], references: [id])
-  libraryId  Int?
+  library Library @relation(fields: [libraryId], references: [id])
+  libraryId  Int
 }
 
 // 章节
@@ -48,6 +48,7 @@ model Chapter{
   type String @default("folder")
   comic Comic @relation(fields: [comicId], references: [id])
   comicId  Int
+  cover String?
 }
 
 // 标签
