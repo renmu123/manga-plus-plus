@@ -7,8 +7,14 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    FileBrowser: typeof import('./../components/fileBrowser/index.vue')['default']
+    FileBrowserDialog: typeof import('./../components/fileBrowserDialog/index.vue')['default']
     HelloWorld: typeof import('./../components/HelloWorld.vue')['default']
+    NButton: typeof import('naive-ui')['NButton']
     NCalendar: typeof import('naive-ui')['NCalendar']
+    NCard: typeof import('naive-ui')['NCard']
+    NIcon: typeof import('naive-ui')['NIcon']
+    NModal: typeof import('naive-ui')['NModal']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

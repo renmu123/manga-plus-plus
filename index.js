@@ -12,6 +12,7 @@ import authorRouter from "./src/routes/author.js";
 import chapterRouter from "./src/routes/chapter.js";
 import tagRouter from "./src/routes/tag.js";
 import libraryRouter from "./src/routes/library.js";
+import pathRouter from "./src/routes/path.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -34,6 +35,7 @@ app.use("/author", authorRouter);
 app.use("/chapter", chapterRouter);
 app.use("/tag", tagRouter);
 app.use("/library", libraryRouter);
+app.use("/path", pathRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello World");
@@ -47,7 +49,6 @@ const errorLogger = (error, request, response, next) => {
 
 const errorHandler = (error, request, response, next) => {
   // Error handling middleware functionality
-  console.log(`error ${error.message}`); // log the error
   const status = error.status || 400;
   // send back an easily understandable error message to the caller
   response.status(status).json({ errors: [{ msg: error.message }] });

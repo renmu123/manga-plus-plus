@@ -4,17 +4,19 @@ import "express-async-errors";
 import validator from "express-validator";
 import validate from "../utils/valid.js";
 import prisma from "../utils/db.js";
+import library from "../services/library.js";
 
-const { body, param } = validator;
+const { body, param, query } = validator;
 const router = express.Router();
 
 router.post(
   "/add",
   validate([body("name").isString(), body("dir").isString()]),
   async (req, res) => {
-    const post = await prisma.library.create({
-      data: req.body,
-    });
+    const post = await library.addLibrary(req.body);
+
+    // scan the library after add library
+    await library.scanLibrary(post.id);
     res.json(post);
   }
 );
@@ -44,10 +46,11 @@ router.post(
   validate([body("id").isInt().toInt()]),
   async (req, res) => {
     const { id } = req.body;
-    const post = await prisma.library.update({
-      where: { id },
-      data: req.body,
-    });
+    const data = req.body;
+    // library dir can not be edit
+    delete data.dir;
+
+    const post = library.editLibrary(id, data);
     res.json(post);
   }
 );
@@ -56,21 +59,27 @@ router.get(
   "/query/:id",
   validate([param("id").isInt().toInt()]),
   async (req, res) => {
-    const post = await prisma.library.findUnique({
-      where: {
-        id: req.params.id,
-      },
-      include: {
-        comics: true,
-      },
-    });
+    const post = await library.getLibrary(req.params.id);
+
     res.json(post);
   }
 );
 
 router.get("/query", async (req, res) => {
-  const post = await prisma.library.findMany({});
-  res.json(post);
+  const librarys = await library.getLibrarys();
+  res.json(librarys);
 });
+
+router.get(
+  "/scan",
+  validate([query("libraryId").isInt().toInt()]),
+  async (req, res) => {
+    const { libraryId } = req.query;
+
+    await library.scanLibrary(libraryId);
+
+    res.json({ success: true });
+  }
+);
 
 export default router;

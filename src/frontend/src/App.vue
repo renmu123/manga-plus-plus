@@ -1,9 +1,11 @@
 <template>
   <div>
-    <n-calendar> </n-calendar>
+    <Home></Home>
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import Home from "@/views/Home/index.vue";
+</script>
 
 <style scoped></style>
