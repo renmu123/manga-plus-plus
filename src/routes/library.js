@@ -82,4 +82,15 @@ router.get(
   }
 );
 
+router.get(
+  "/scanCover",
+  validate([query("libraryId").isInt().toInt()]),
+  async (req, res) => {
+    const { libraryId } = req.query;
+
+    await library.scanCover(libraryId);
+
+    res.json({ success: true });
+  }
+);
 export default router;

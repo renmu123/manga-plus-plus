@@ -46,7 +46,7 @@ router.post(
   validate([body("id").isInt().toInt()]),
   async (req, res) => {
     const { id } = req.body;
-    const post = await comic.editComic(id, req.body);
+    const post = await comic.updateComic(id, req.body);
 
     res.json(post);
   }

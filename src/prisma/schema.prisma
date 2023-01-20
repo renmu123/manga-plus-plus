@@ -29,8 +29,8 @@ model Comic {
   id Int @id @default(autoincrement())
   name String
   authors Author[]
+  dir String?
   publish String?
-  path String?
   publishTime Int? 
   cover String?
   isReaded Boolean @default(false)  // 是否已读
@@ -57,9 +57,3 @@ model Tag {
   name String // 名称
   comics Comic[]
 }
-
-// 设置
-// model Config {
-//   id Int @id @default(autoincrement())
-//   key
-// }

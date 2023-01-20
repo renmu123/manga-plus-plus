@@ -39,7 +39,7 @@ const addComic = async (data) => {
 
 const removeComic = async (id) => {};
 
-const editComic = async (id, data) => {
+const updateComic = async (id, data) => {
   const post = await prisma.comic.update({
     where: { id },
     data: data,
@@ -52,5 +52,5 @@ export default {
   getComic,
   addComic,
   addComic,
-  editComic,
+  updateComic,
 };

@@ -1,6 +1,12 @@
 import prisma from "../utils/db.js";
-import fs from "fs/promises";
+
+import fs, { readdir } from "fs/promises";
 import path from "path";
+import { keyBy, uniqBy } from "lodash-es";
+
+import comicSerice from "./comic.js";
+import chapterService from "./chapter.js";
+import { filterImg } from "../utils/index.js";
 
 const getLibrary = async (id) => {
   const post = await prisma.library.findUnique({
@@ -41,7 +47,7 @@ const scanLibrary = async (libraryId) => {
     },
   });
   if (!library) {
-    res.status(400).json({ errors: [{ msg: "libraryId不合法" }] });
+    throw new Error("libraryId不合法");
   }
 
   const dir = library.dir;
@@ -81,7 +87,7 @@ const scanLibrary = async (libraryId) => {
             continue;
           }
           data2[comicName] = data2[comicName] || [];
-          data2[comicName].push({ name: file, dir: filePath });
+          data2[comicName].push({ name: file, dir: filePath2 });
         }
       }
       if (hasDefault) {
@@ -117,21 +123,48 @@ const scanLibrary = async (libraryId) => {
         },
       });
       if (!post2) {
-        post2 = await prisma.chapter.create({
-          data: {
-            name: chapter.name,
-            comicId: post.id,
-            dir: chapter.dir,
-          },
-        });
+        await chapterService.addChapter(data);
       }
     }
   }
+
+  scanCover();
 };
 
 // scan cover
 const scanCover = async (libraryId) => {
-  // const comics =
+  const comics = await comicSerice.getComics(libraryId);
+
+  const chapterData = [];
+  for (const comic of comics) {
+    const chapters = await chapterService.getChapters(comic.id);
+    for (const chapter of chapters) {
+      // if (chapter.cover) continue;
+      if (chapter.type === "folder") {
+        const names = await readdir(chapter.dir);
+        const cover = filterImg(names)[0];
+        if (cover) {
+          chapterData.push({
+            id: chapter.id,
+            cover: path.join(chapter.dir, cover),
+            comicId: comic.id,
+          });
+        }
+      }
+    }
+  }
+
+  // update chapter cover
+  for (const chapter of chapterData) {
+    await chapterService.updateChapter(chapter.id, chapter);
+  }
+
+  // update comic cover which has not cover,use the chapter cover default.
+  for (const comic of uniqBy(chapterData, "comicId")) {
+    if (!keyBy(comics, "id")[comic.comicId].cover) {
+      await comicSerice.updateComic(comic.comicId, { cover: comic.cover });
+    }
+  }
 };
 
 export default {
@@ -140,4 +173,5 @@ export default {
   editLibrary,
   addLibrary,
   scanLibrary,
+  scanCover,
 };
