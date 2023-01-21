@@ -37,7 +37,7 @@ router.post(
 );
 
 router.get(
-  "/query/:id",
+  "/:id",
   validate([param("id").isInt().toInt()]),
   async (req, res) => {
     const post = await chapter.getChapter(req.params.id);
@@ -46,7 +46,7 @@ router.get(
 );
 
 router.get(
-  "/query",
+  "/list",
   validate([query("comicId").isInt().toInt()]),
   async (req, res) => {
     const post = await chapter.getChapters(req.query.comicId);
