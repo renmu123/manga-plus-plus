@@ -13,6 +13,7 @@ import chapterRouter from "./src/routes/chapter.js";
 import tagRouter from "./src/routes/tag.js";
 import libraryRouter from "./src/routes/library.js";
 import pathRouter from "./src/routes/path.js";
+import configRouter from "./src/routes/config.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -36,6 +37,7 @@ app.use("/chapter", chapterRouter);
 app.use("/tag", tagRouter);
 app.use("/library", libraryRouter);
 app.use("/path", pathRouter);
+app.use("/config", configRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello World");

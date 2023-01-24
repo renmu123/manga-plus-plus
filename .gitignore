@@ -5,3 +5,4 @@ node_modules
 access.log
 *.db
 *.db-journal
+setting.json

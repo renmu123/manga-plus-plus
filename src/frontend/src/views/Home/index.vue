@@ -12,7 +12,7 @@ import fileBrowserDialog from "@/components/fileBrowserDialog/index.vue";
 
 const visible = ref(true);
 
-const path = ref("//");
+const path = ref("/");
 </script>
 
 <style scoped></style>

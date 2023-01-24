@@ -37,7 +37,7 @@ router.post(
 );
 
 router.get(
-  "/:id",
+  "/query/:id",
   validate([param("id").isInt().toInt()]),
   async (req, res) => {
     const post = await chapter.getChapter(req.params.id);

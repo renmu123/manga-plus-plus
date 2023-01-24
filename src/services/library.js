@@ -15,13 +15,20 @@ const getLibrary = async (id) => {
     },
     include: {
       comics: true,
+      config: true,
     },
   });
   return post;
 };
 
-const getLibrarys = async () => {
-  const posts = await prisma.library.findMany({});
+const getLibrarys = async (data, queryConfig = false) => {
+  console.log(data);
+  const posts = await prisma.library.findMany({
+    where: data,
+    include: {
+      config: queryConfig,
+    },
+  });
   return posts;
 };
 
@@ -34,6 +41,12 @@ const editLibrary = async (id, data) => {
 };
 
 const addLibrary = async (data) => {
+  if (data.config) {
+    data["config"] = {
+      create: data.config,
+    };
+  }
+
   const post = await prisma.library.create({
     data: data,
   });

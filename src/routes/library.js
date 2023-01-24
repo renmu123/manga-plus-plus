@@ -5,15 +5,26 @@ import validator from "express-validator";
 import validate from "../utils/valid.js";
 import prisma from "../utils/db.js";
 import library from "../services/library.js";
+import { merge } from "lodash-es";
 
 const { body, param, query } = validator;
 const router = express.Router();
 
 router.post(
   "/add",
-  validate([body("name").isString(), body("dir").isString()]),
+  validate([
+    body("name").isString(),
+    body("dir").isString(),
+    body("config").isObject(),
+  ]),
   async (req, res) => {
-    const post = await library.addLibrary(req.body);
+    let data = req.body;
+
+    const defaultConfig = {
+      coverCopy: false,
+    };
+    data = merge({ config: defaultConfig }, data);
+    const post = await library.addLibrary(data);
 
     // scan the library after add library
     await library.scanLibrary(post.id);
@@ -28,11 +39,6 @@ router.post(
     const { id } = req.body;
 
     await prisma.$transaction([
-      prisma.comic.deleteMany({
-        where: {
-          libraryId: id,
-        },
-      }),
       prisma.library.delete({
         where: { id },
       }),
@@ -56,7 +62,7 @@ router.post(
 );
 
 router.get(
-  "/:id",
+  "/query/:id",
   validate([param("id").isInt().toInt()]),
   async (req, res) => {
     const post = await library.getLibrary(req.params.id);
@@ -65,10 +71,18 @@ router.get(
   }
 );
 
-router.get("/list", async (req, res) => {
-  const librarys = await library.getLibrarys();
-  res.json(librarys);
-});
+router.get(
+  "/list",
+  validate([query("queryConfig").optional()]),
+  async (req, res) => {
+    const queryConfig = req.query.queryConfig == "1" ? true : false;
+    const queryData = {
+      name: req.query.name,
+    };
+    const librarys = await library.getLibrarys(queryData, queryConfig);
+    res.json(librarys);
+  }
+);
 
 router.get(
   "/scan",

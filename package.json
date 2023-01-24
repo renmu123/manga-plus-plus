@@ -5,13 +5,15 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon server.js",
-    "migrate": "npx prisma migrate dev --schema ./src/prisma/schema.prisma",
-    "studio": "npx prisma studio"
+    "db:migrate": "npx prisma migrate dev --schema ./src/prisma/schema.prisma",
+    "db:push": "npx prisma db push --schema ./src/prisma/schema.prisma",
+    "db:studio": "npx prisma studio"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
     "@prisma/client": "^4.9.0",
+    "app-root-path": "^3.1.0",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "express-async-errors": "^3.1.1",

@@ -11,7 +11,7 @@ const router = express.Router();
 
 // 添加路由
 router.post("/add", validate([body("name").isString()]), async (req, res) => {
-  const { name, tags } = req.body;
+  const { name } = req.body;
 
   const data = {
     name,
@@ -28,15 +28,16 @@ router.post(
     const { id } = req.body;
 
     await prisma.$transaction([
-      prisma.chapter.deleteMany({
-        where: {
-          comicId: id,
-        },
-      }),
+      // prisma.chapter.deleteMany({
+      //   where: {
+      //     comicId: id,
+      //   },
+      // }),
       prisma.comic.delete({
         where: { id },
       }),
     ]);
+    // TODO:delete local files
     res.json({ success: true });
   }
 );
@@ -53,7 +54,7 @@ router.post(
 );
 
 router.get(
-  "/:id",
+  "/query/:id",
   validate([param("id").isInt().toInt()]),
   async (req, res) => {
     const post = await comic.getComic(req.params.id);

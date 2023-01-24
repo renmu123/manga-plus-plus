@@ -41,7 +41,7 @@ router.post(
 );
 
 router.get(
-  "/:id",
+  "/query/:id",
   validate([param("id").isInt().toInt()]),
   async (req, res) => {
     const post = await prisma.tag.findUnique({

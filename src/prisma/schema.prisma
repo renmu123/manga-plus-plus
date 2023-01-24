@@ -22,6 +22,16 @@ model Library {
   name String
   dir String
   comics Comic[]
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  config   LibraryConfig @relation(fields: [configId], references: [id], onDelete: Cascade)
+  configId Int  @unique 
+}
+
+model LibraryConfig{
+  id Int @id @default(autoincrement())
+  library Library?
+  coverCopy Boolean @default(false)  // 是否复制cover到metadata文件夹
 }
 
 // 漫画
@@ -36,8 +46,16 @@ model Comic {
   isReaded Boolean @default(false)  // 是否已读
   chapters Chapter[]  // 章节
   tags Tag[]
-  library Library @relation(fields: [libraryId], references: [id])
+  library Library @relation(fields: [libraryId], references: [id], onDelete: Cascade)
   libraryId  Int
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  summary String? // 简介
+  hash String? // 文件hash，用于文件迁移
+}
+
+model ComicLinks {
+  id Int @id @default(autoincrement())
 }
 
 // 章节
@@ -46,9 +64,14 @@ model Chapter{
   name String // 名称
   dir String // 目录
   type String @default("folder")
-  comic Comic @relation(fields: [comicId], references: [id])
+  comic Comic @relation(fields: [comicId], references: [id], onDelete: Cascade)
   comicId  Int
   cover String?
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  summary String? // 简介
+  sort Int @default(0) // 排序
+  category String?  // 分类
 }
 
 // 标签
@@ -57,3 +80,8 @@ model Tag {
   name String // 名称
   comics Comic[]
 }
+
+// 阅读记录
+// model History {
+//   id Int @id @default(autoincrement())
+// }
