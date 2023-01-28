@@ -5,7 +5,6 @@ import validator from "express-validator";
 import validate from "../utils/valid.js";
 import prisma from "../utils/db.js";
 import library from "../services/library.js";
-import { merge } from "lodash-es";
 
 const { body, param, query } = validator;
 const router = express.Router();
@@ -19,11 +18,10 @@ router.post(
   ]),
   async (req, res) => {
     let data = req.body;
-
-    const defaultConfig = {
-      coverCopy: false,
-    };
-    data = merge({ config: defaultConfig }, data);
+    const librarys = await library.getLibrarys({ dir: data.dir });
+    if (librarys.length !== 0) {
+      throw new Error("该路径下已存在库");
+    }
     const post = await library.addLibrary(data);
 
     // scan the library after add library

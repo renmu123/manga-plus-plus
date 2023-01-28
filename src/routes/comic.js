@@ -54,6 +54,15 @@ router.post(
 );
 
 router.get(
+  "/list",
+  validate([query("libraryId").isInt().toInt()]),
+  async (req, res) => {
+    const posts = await comic.getComics(req.query.libraryId);
+    res.json(posts);
+  }
+);
+
+router.get(
   "/query/:id",
   validate([param("id").isInt().toInt()]),
   async (req, res) => {
@@ -63,11 +72,11 @@ router.get(
 );
 
 router.get(
-  "/list",
-  validate([query("libraryId").isInt().toInt()]),
+  "/query/:id/detail",
+  validate([param("id").isInt().toInt()]),
   async (req, res) => {
-    const posts = await comic.getComics(req.query.libraryId);
-    res.json(posts);
+    const post = await comic.getComic(req.params.id);
+    res.json(post);
   }
 );
 

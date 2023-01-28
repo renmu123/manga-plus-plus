@@ -1,9 +1,12 @@
 import prisma from "../utils/db.js";
 
-const getComics = async (libraryId) => {
+const getComics = async (libraryId, includeChapters = false) => {
   const post = await prisma.comic.findMany({
     where: {
       libraryId: libraryId,
+    },
+    include: {
+      chapters: includeChapters,
     },
   });
   return post;
@@ -37,7 +40,12 @@ const addComic = async (data) => {
   return post;
 };
 
-const removeComic = async (id) => {};
+const removeComic = async (id) => {
+  const post = await prisma.comic.delete({
+    where: { id },
+  });
+  return post;
+};
 
 const updateComic = async (id, data) => {
   const post = await prisma.comic.update({
@@ -53,4 +61,5 @@ export default {
   addComic,
   addComic,
   updateComic,
+  removeComic,
 };

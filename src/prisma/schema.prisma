@@ -25,13 +25,15 @@ model Library {
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
   config   LibraryConfig @relation(fields: [configId], references: [id], onDelete: Cascade)
-  configId Int  @unique 
+  configId Int  @unique
 }
 
 model LibraryConfig{
   id Int @id @default(autoincrement())
   library Library?
-  coverCopy Boolean @default(false)  // 是否复制cover到metadata文件夹
+  coverCopy Boolean @default(true)  // 是否复制cover到metadata文件夹
+  fileHash Boolean @default(true)  // 是否对文件进行hash
+  scanRootArchiveFile Boolean @default(false)  // 扫描根目录下的归档文件，并建立文件夹
 }
 
 // 漫画
@@ -40,8 +42,8 @@ model Comic {
   name String
   authors Author[]
   dir String?
-  publish String?
-  publishTime Int? 
+  publish String?  // 出版社
+  publishTime DateTime?   // 出版时间
   cover String?
   isReaded Boolean @default(false)  // 是否已读
   chapters Chapter[]  // 章节
@@ -54,9 +56,6 @@ model Comic {
   hash String? // 文件hash，用于文件迁移
 }
 
-model ComicLinks {
-  id Int @id @default(autoincrement())
-}
 
 // 章节
 model Chapter{

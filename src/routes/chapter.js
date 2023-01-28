@@ -11,7 +11,9 @@ const router = express.Router();
 
 // 添加路由
 router.post("/add", validate([body("name").isString()]), async (req, res) => {
-  const post = await chapter.addChapter(req.body);
+  const data = req.body;
+  delete data.type;
+  const post = await chapter.addChapter(data);
   res.json(post);
 });
 
@@ -30,6 +32,8 @@ router.post(
   validate([body("id").isInt().toInt()]),
   async (req, res) => {
     const { id } = req.body;
+    const data = req.body;
+    delete data.type;
 
     const post = await chapter.updateChapter(id, req.body);
     res.json(post);
