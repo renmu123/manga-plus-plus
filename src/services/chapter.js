@@ -14,9 +14,9 @@ const getChapter = async (id) => {
     where: {
       id: id,
     },
-    include: {
-      comics: true,
-    },
+    // include: {
+    //   comic: true,
+    // },
   });
   return post;
 };

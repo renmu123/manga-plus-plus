@@ -77,8 +77,6 @@ const scanLibrary = async (libraryId) => {
     throw new Error("libraryId不合法");
   }
 
-  const libraryConfig = await getLibraryConfig(libraryId);
-
   const dir = library.dir;
   let files = await fs.readdir(dir);
   const data2 = {};

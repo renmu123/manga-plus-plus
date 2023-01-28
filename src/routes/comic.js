@@ -59,20 +59,20 @@ router.get(
 );
 
 router.get(
+  "/query/:id",
+  validate([param("id").isInt().toInt()]),
+  async (req, res) => {
+    const post = await comic.getComic(req.params.id);
+    res.json(post);
+  }
+);
+
+router.get(
   "/query/:id/detail",
   validate([param("id").isInt().toInt()]),
   async (req, res) => {
     const post = await comic.getComic(req.params.id);
     res.json({ post });
-  }
-);
-
-router.get(
-  "/:id",
-  validate([param("id").isInt().toInt()]),
-  async (req, res) => {
-    const post = await comic.getComic(req.params.id);
-    res.json(post);
   }
 );
 

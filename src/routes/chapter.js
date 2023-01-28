@@ -1,9 +1,10 @@
 import express from "express";
 import "express-async-errors";
+import fs from "fs-extra";
 
 import validator from "express-validator";
 import validate from "../utils/valid.js";
-import prisma from "../utils/db.js";
+import { filterImgFile } from "../utils/index.js";
 import chapter from "../services/chapter.js";
 
 const { body, param, query } = validator;
@@ -46,6 +47,24 @@ router.post(
 router.get(
   "/query/:id",
   validate([param("id").isInt().toInt()]),
+  async (req, res) => {
+    const post = await chapter.getChapter(req.params.id);
+    if (!(await fs.pathExists(post.dir))) {
+      throw new Error("该路径下不存在章节");
+    }
+    const names = await fs.readdir(post.dir);
+    const imageFiles = await filterImgFile(names);
+    res.json({ ...post, total: imageFiles.length });
+  }
+);
+
+router.get(
+  "/query/:id/image",
+  validate([
+    param("id").isInt().toInt(),
+    param("page").isInt().toInt(),
+    param("offset").isInt().toInt(),
+  ]),
   async (req, res) => {
     const post = await chapter.getChapter(req.params.id);
     res.json(post);
