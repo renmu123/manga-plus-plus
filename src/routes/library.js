@@ -18,6 +18,10 @@ router.post(
   ]),
   async (req, res) => {
     let data = req.body;
+
+    if (!existsSync(data.dir)) {
+      throw new Error("路径不存在");
+    }
     const librarys = await library.getLibrarys({ dir: data.dir });
     if (librarys.length !== 0) {
       throw new Error("该路径下已存在库");

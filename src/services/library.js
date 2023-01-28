@@ -1,9 +1,11 @@
 import prisma from "../utils/db.js";
+import { copyCoverToMetadata, writeCoverToMetadata } from "../utils/index.js";
 
-import fs, { readdir } from "fs/promises";
+import fs from "fs/promises";
 import { existsSync } from "fs";
 import path from "path";
 import { keyBy, uniqBy, merge } from "lodash-es";
+import AdmZip from "adm-zip";
 
 import comicSerice from "./comic.js";
 import chapterService from "./chapter.js";
@@ -18,6 +20,15 @@ const getLibrary = async (id) => {
     include: {
       comics: true,
       config: true,
+    },
+  });
+  return post;
+};
+
+const getLibraryConfig = async (libraryId) => {
+  const post = await prisma.libraryConfig.findUnique({
+    where: {
+      id: libraryId,
     },
   });
   return post;
@@ -43,8 +54,7 @@ const editLibrary = async (id, data) => {
 
 const addLibrary = async (data) => {
   const defaultConfig = {
-    coverCopy: false,
-    fileHash: true,
+    coverCopy: true,
     scanRootArchiveFile: false,
   };
   data = merge({ config: defaultConfig }, data);
@@ -66,6 +76,8 @@ const scanLibrary = async (libraryId) => {
   if (!library) {
     throw new Error("libraryId不合法");
   }
+
+  const libraryConfig = await getLibraryConfig(libraryId);
 
   const dir = library.dir;
   let files = await fs.readdir(dir);
@@ -96,12 +108,14 @@ const scanLibrary = async (libraryId) => {
         const fileStat = await fs.stat(filePath2);
 
         if (fileStat.isFile()) {
-          if (idArchiveFile(file)) {
-            data2[comicName] = data2[comicName] || [];
-            data2[comicName].push({ name: file, dir: filePath2, type: "file" });
+          if (!idArchiveFile(file)) {
+            continue;
           }
-          // 如果在漫画根文件夹下有图片文件，生成一个虚拟章节，名称为 default
+
+          data2[comicName] = data2[comicName] || [];
+          data2[comicName].push({ name: file, dir: filePath2, type: "file" });
           if (isImgFile(file)) {
+            // 如果在漫画根文件夹下有图片文件，生成一个虚拟章节，名称为 default
             hasDefault = true;
           }
         } else if (fileStat.isDirectory) {
@@ -175,32 +189,61 @@ const scanLibrary = async (libraryId) => {
   }
 
   // 扫描封面
-  scanCover();
+  scanCover(libraryId);
 };
 
 // scan cover
 const scanCover = async (libraryId) => {
   const comics = await comicSerice.getComics(libraryId);
+  const libraryConfig = await getLibraryConfig(libraryId);
 
   const chapterData = [];
   for (const comic of comics) {
     const chapters = await chapterService.getChapters(comic.id);
     for (const chapter of chapters) {
-      // if (chapter.cover) continue;
+      if (chapter.cover) continue;
       if (chapter.type === "folder") {
-        const names = await readdir(chapter.dir);
+        const names = await fs.readdir(chapter.dir);
         const cover = filterImgFile(names)[0];
+
         if (cover) {
+          let coverPath = path.join(chapter.dir, cover);
+          if (libraryConfig.coverCopy) {
+            coverPath = await copyCoverToMetadata(coverPath);
+          } else {
+            coverPath = path.join(chapter.dir, cover);
+          }
+
           chapterData.push({
             id: chapter.id,
-            cover: path.join(chapter.dir, cover),
+            cover: coverPath,
             comicId: comic.id,
           });
         }
       } else if (chapter.type === "file") {
+        const zip = new AdmZip(chapter.dir);
+        const zipEntries = zip.getEntries(); // an array of ZipEntry records
+        let coverPath;
+
+        for (const zipEntry of zipEntries) {
+          if (!zipEntry.isDirectory && isImgFile(zipEntry.name)) {
+            const data = zipEntry.getData();
+            coverPath = await writeCoverToMetadata(data);
+            break;
+          }
+        }
+
+        if (coverPath) {
+          chapterData.push({
+            id: chapter.id,
+            cover: coverPath,
+            comicId: comic.id,
+          });
+        }
       }
     }
   }
+  console.log(chapterData);
 
   // update chapter cover
   for (const chapter of chapterData) {
@@ -222,4 +265,5 @@ export default {
   addLibrary,
   scanLibrary,
   scanCover,
+  getLibraryConfig,
 };

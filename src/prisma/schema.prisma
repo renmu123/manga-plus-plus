@@ -24,15 +24,15 @@ model Library {
   comics Comic[]
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
-  config   LibraryConfig @relation(fields: [configId], references: [id], onDelete: Cascade)
-  configId Int  @unique
+  config LibraryConfig?
 }
 
 model LibraryConfig{
   id Int @id @default(autoincrement())
-  library Library?
+  library   Library @relation(fields: [libraryId], references: [id], onDelete: Cascade)
+  libraryId Int @unique
+
   coverCopy Boolean @default(true)  // 是否复制cover到metadata文件夹
-  fileHash Boolean @default(true)  // 是否对文件进行hash
   scanRootArchiveFile Boolean @default(false)  // 扫描根目录下的归档文件，并建立文件夹
 }
 
@@ -53,7 +53,6 @@ model Comic {
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
   summary String? // 简介
-  hash String? // 文件hash，用于文件迁移
 }
 
 

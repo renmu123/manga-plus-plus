@@ -28,11 +28,6 @@ router.post(
     const { id } = req.body;
 
     await prisma.$transaction([
-      // prisma.chapter.deleteMany({
-      //   where: {
-      //     comicId: id,
-      //   },
-      // }),
       prisma.comic.delete({
         where: { id },
       }),
@@ -47,6 +42,7 @@ router.post(
   validate([body("id").isInt().toInt()]),
   async (req, res) => {
     const { id } = req.body;
+    // TODO:编辑comic名称时，源文件名称也会修改
     const post = await comic.updateComic(id, req.body);
 
     res.json(post);
@@ -63,16 +59,16 @@ router.get(
 );
 
 router.get(
-  "/query/:id",
+  "/query/:id/detail",
   validate([param("id").isInt().toInt()]),
   async (req, res) => {
     const post = await comic.getComic(req.params.id);
-    res.json(post);
+    res.json({ post });
   }
 );
 
 router.get(
-  "/query/:id/detail",
+  "/:id",
   validate([param("id").isInt().toInt()]),
   async (req, res) => {
     const post = await comic.getComic(req.params.id);

@@ -22,6 +22,7 @@ router.post(
   validate([body("id").isInt().toInt()]),
   async (req, res) => {
     const { id } = req.body;
+    // TODO:delete local files
     const post = await chapter.removeChapter(id);
     res.json(post);
   }
@@ -36,6 +37,8 @@ router.post(
     delete data.type;
 
     const post = await chapter.updateChapter(id, req.body);
+    // TODO:更新chapter名称时，源文件名称也会修改
+
     res.json(post);
   }
 );
