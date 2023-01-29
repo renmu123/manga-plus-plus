@@ -11,11 +11,21 @@ const router = express.Router();
 
 // 添加路由
 router.post("/add", validate([body("name").isString()]), async (req, res) => {
-  const { name } = req.body;
+  const status = req.body.status || 2;
+  const readingStatus = req.body.readingStatus || 1;
 
-  const data = {
-    name,
-  };
+  if (![1, 2].includes(status)) {
+    throw new Error("status状态值仅限1，2");
+  }
+  if (![1, 2, 3].includes(readingStatus)) {
+    throw new Error("status状态值仅限1，2，3");
+  }
+
+  const data = req.body;
+  delete data.dir;
+  data.status = status;
+  data.readingStatus = readingStatus;
+
   const post = await comic.addComic(data);
 
   res.json(post);
@@ -41,7 +51,21 @@ router.post(
   "/edit",
   validate([body("id").isInt().toInt()]),
   async (req, res) => {
+    const status = req.body.status;
+    const readingStatus = req.body.readingStatus;
     const { id } = req.body;
+
+    if (status && ![1, 2].includes(status)) {
+      throw new Error("status状态值仅限1，2");
+    }
+    if (readingStatus && ![1, 2, 3].includes(readingStatus)) {
+      throw new Error("status状态值仅限1，2，3");
+    }
+
+    const data = req.body;
+    data.status = status;
+    data.readingStatus = readingStatus;
+
     // TODO:编辑comic名称时，源文件名称也会修改
     const post = await comic.updateComic(id, req.body);
 
@@ -68,10 +92,24 @@ router.get(
 );
 
 router.get(
-  "/query/:id/detail",
-  validate([param("id").isInt().toInt()]),
+  "/query/:id/upsertHistory",
+  validate([
+    param("id").isInt().toInt(),
+    query("chapterId").isInt().toInt(),
+    query("page").isInt().toInt(),
+  ]),
   async (req, res) => {
-    const post = await comic.getComic(req.params.id);
+    const data = {
+      comicId: req.params.id,
+      chapterId: req.query.chapterId,
+      page: req.query.page,
+    };
+    const post = await prisma.history.upsert({
+      where: { comicId: req.params.id, chapterId: req.query.chapterId },
+      update: data,
+      create: datar,
+    });
+
     res.json({ post });
   }
 );

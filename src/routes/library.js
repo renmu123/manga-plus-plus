@@ -88,11 +88,11 @@ router.get(
 
 router.get(
   "/scan",
-  validate([query("libraryId").isInt().toInt()]),
+  validate([query("id").isInt().toInt()]),
   async (req, res) => {
-    const { libraryId } = req.query;
+    const { id } = req.query;
 
-    await library.scanLibrary(libraryId);
+    await library.scanLibrary(id);
 
     res.json({ success: true });
   }
@@ -100,11 +100,11 @@ router.get(
 
 router.get(
   "/scanCover",
-  validate([query("libraryId").isInt().toInt()]),
+  validate([query("id").isInt().toInt()]),
   async (req, res) => {
-    const { libraryId } = req.query;
+    const { id } = req.query;
 
-    await library.scanCover(libraryId);
+    await library.scanCover(id);
 
     res.json({ success: true });
   }

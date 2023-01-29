@@ -9,7 +9,7 @@ import AdmZip from "adm-zip";
 
 import comicSerice from "./comic.js";
 import chapterService from "./chapter.js";
-import { filterImgFile, isImgFile, idArchiveFile } from "../utils/index.js";
+import { isImgFile, idArchiveFile, readImageFromDir } from "../utils/index.js";
 import comic from "./comic.js";
 
 const getLibrary = async (id) => {
@@ -201,8 +201,7 @@ const scanCover = async (libraryId) => {
     for (const chapter of chapters) {
       if (chapter.cover) continue;
       if (chapter.type === "folder") {
-        const names = await fs.readdir(chapter.dir);
-        const cover = filterImgFile(names)[0];
+        const cover = await readImageFromDir(chapter.dir)[0];
 
         if (cover) {
           let coverPath = path.join(chapter.dir, cover);
@@ -225,8 +224,10 @@ const scanCover = async (libraryId) => {
 
         for (const zipEntry of zipEntries) {
           if (!zipEntry.isDirectory && isImgFile(zipEntry.name)) {
+            const { ext } = path.parse(zipEntry.name);
+
             const data = zipEntry.getData();
-            coverPath = await writeCoverToMetadata(data);
+            coverPath = await writeCoverToMetadata(data, ext);
             break;
           }
         }

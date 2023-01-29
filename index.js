@@ -12,7 +12,7 @@ import authorRouter from "./src/routes/author.js";
 import chapterRouter from "./src/routes/chapter.js";
 import tagRouter from "./src/routes/tag.js";
 import libraryRouter from "./src/routes/library.js";
-import pathRouter from "./src/routes/path.js";
+import commonRouter from "./src/routes/common.js";
 import configRouter from "./src/routes/config.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -36,7 +36,7 @@ app.use("/author", authorRouter);
 app.use("/chapter", chapterRouter);
 app.use("/tag", tagRouter);
 app.use("/library", libraryRouter);
-app.use("/path", pathRouter);
+app.use("/common", commonRouter);
 app.use("/config", configRouter);
 
 app.get("/", (req, res) => {

@@ -45,7 +45,7 @@ model Comic {
   publish String?  // 出版社
   publishTime DateTime?   // 出版时间
   cover String?
-  isReaded Boolean @default(false)  // 是否已读
+  status Int @default(2) // 1：连载中，2：已完结
   chapters Chapter[]  // 章节
   tags Tag[]
   library Library @relation(fields: [libraryId], references: [id], onDelete: Cascade)
@@ -53,6 +53,8 @@ model Comic {
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
   summary String? // 简介
+  inReadList Boolean @default(false)  // 是否在待阅读列表中
+  readingStatus Int @default(1)  // 1：未读，2：阅读中，3：已读
 }
 
 
@@ -80,6 +82,9 @@ model Tag {
 }
 
 // 阅读记录
-// model History {
-//   id Int @id @default(autoincrement())
-// }
+model History {
+  comicId Int @unique
+  chapterId Int @unique
+  page Int
+  updatedAt DateTime @updatedAt
+}

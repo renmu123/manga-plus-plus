@@ -1,11 +1,11 @@
 <template>
   <div>
-    <Home></Home>
+    <Dashboard></Dashboard>
   </div>
 </template>
 
 <script setup lang="ts">
-import Home from "@/views/Home/index.vue";
+import Dashboard from "@/views/Dashboard/index.vue";
 </script>
 
 <style scoped></style>
