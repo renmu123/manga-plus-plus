@@ -4,12 +4,14 @@ import "express-async-errors";
 import validator from "express-validator";
 import validate from "../utils/valid.js";
 import prisma from "../utils/db.js";
+import { getCover } from "../utils/index.js";
+
 import comic from "../services/comic.js";
 
 const { body, param, query } = validator;
 const router = express.Router();
 
-// 添加路由
+// 添加漫画
 router.post("/add", validate([body("name").isString()]), async (req, res) => {
   const status = req.body.status || 2;
   const readingStatus = req.body.readingStatus || 1;
@@ -36,6 +38,7 @@ router.post(
   validate([body("id").isInt().toInt()]),
   async (req, res) => {
     const { id } = req.body;
+    const post = prisma.comic.getComic(id);
 
     await prisma.$transaction([
       prisma.comic.delete({
@@ -43,6 +46,7 @@ router.post(
       }),
     ]);
     // TODO:delete local files
+
     res.json({ success: true });
   }
 );
@@ -66,7 +70,6 @@ router.post(
     data.status = status;
     data.readingStatus = readingStatus;
 
-    // TODO:编辑comic名称时，源文件名称也会修改
     const post = await comic.updateComic(id, req.body);
 
     res.json(post);
@@ -75,18 +78,44 @@ router.post(
 
 router.get(
   "/list",
-  validate([query("libraryId").isInt().toInt()]),
+  validate([
+    query("libraryId").isInt().toInt(),
+    query("idCursor").default(0).isInt().toInt(),
+    query("size").default(50).isInt().toInt(),
+  ]),
   async (req, res) => {
-    const posts = await comic.getComics(req.query.libraryId);
+    let posts = await comic.getComics(req.query.libraryId, false, {
+      size: req.query.size,
+      idCursor: req.query.idCursor,
+    });
+
+    posts = posts.map((item) => {
+      if (item.cover) {
+        item.cover = getCover(item.cover);
+      }
+      return item;
+    });
     res.json(posts);
   }
 );
 
 router.get(
   "/query/:id",
-  validate([param("id").isInt().toInt()]),
+  validate([
+    param("id").isInt().toInt(),
+    query("includeChapters").default(false).toBoolean(),
+    query("includeTags").default(true).toBoolean(),
+    query("includeAuthors").default(true).toBoolean(),
+  ]),
   async (req, res) => {
-    const post = await comic.getComic(req.params.id);
+    const post = await comic.getComic(req.params.id, {
+      chapters: req.query.includeChapters,
+      tags: req.query.includeTags,
+      authors: req.query.includeAuthors,
+    });
+    if (post.cover) {
+      post.cover = getCover(post.cover);
+    }
     res.json(post);
   }
 );
@@ -107,7 +136,7 @@ router.get(
     const post = await prisma.history.upsert({
       where: { comicId: req.params.id, chapterId: req.query.chapterId },
       update: data,
-      create: datar,
+      create: data,
     });
 
     res.json({ post });

@@ -4,6 +4,8 @@ import "express-async-errors";
 import validator from "express-validator";
 import validate from "../utils/valid.js";
 import prisma from "../utils/db.js";
+import { getCover } from "../utils/index.js";
+
 import library from "../services/library.js";
 
 const { body, param, query } = validator;
@@ -57,17 +59,31 @@ router.post(
     const data = req.body;
     // library dir can not be edit
     delete data.dir;
+    if (data.config) {
+      delete data.config.libraryId;
+    }
 
-    const post = library.editLibrary(id, data);
+    const post = await library.editLibrary(id, data);
     res.json(post);
   }
 );
 
 router.get(
   "/query/:id",
-  validate([param("id").isInt().toInt()]),
+  validate([
+    param("id").isInt().toInt(),
+    query("includeComics").default(false).isBoolean(),
+    query("includeConfig").default(false).isBoolean(),
+  ]),
   async (req, res) => {
-    const post = await library.getLibrary(req.params.id);
+    const post = await library.getLibrary(
+      req.params.id,
+      req.query.includeComics,
+      req.query.includeConfig
+    );
+    if (post.cover) {
+      post.cover = getCover(post.cover);
+    }
 
     res.json(post);
   }
@@ -81,7 +97,13 @@ router.get(
     const queryData = {
       name: req.query.name,
     };
-    const librarys = await library.getLibrarys(queryData, queryConfig);
+    let librarys = await library.getLibrarys(queryData, queryConfig);
+    librarys = librarys.map((item) => {
+      if (item.cover) {
+        item.cover = getCover(item.cover);
+      }
+      return item;
+    });
     res.json(librarys);
   }
 );

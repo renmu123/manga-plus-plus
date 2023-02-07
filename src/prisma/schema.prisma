@@ -25,6 +25,7 @@ model Library {
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
   config LibraryConfig?
+  cover String?
 }
 
 model LibraryConfig{
@@ -33,7 +34,7 @@ model LibraryConfig{
   libraryId Int @unique
 
   coverCopy Boolean @default(true)  // 是否复制cover到metadata文件夹
-  scanRootArchiveFile Boolean @default(false)  // 扫描根目录下的归档文件，并建立文件夹
+  scanRootArchiveFile Boolean @default(false)  // 扫描根目录下的归档文件
 }
 
 // 漫画

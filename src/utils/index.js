@@ -31,7 +31,7 @@ const readImageFromAcrchive = (path) => {
 };
 
 const isImgFile = (name) => {
-  const extList = [".png", ".jpg", ".gif", ".webp"];
+  const extList = [".png", ".jpg", ".gif", ".webp", ".avif"];
   if (extList.includes(path.extname(name))) {
     return true;
   } else {
@@ -39,7 +39,7 @@ const isImgFile = (name) => {
   }
 };
 
-const idArchiveFile = (name) => {
+const isArchiveFile = (name) => {
   const extList = [".zip"];
   if (extList.includes(path.extname(name))) {
     return true;
@@ -245,14 +245,20 @@ const getContentType = (name) => {
   return extTypes[ext.toLowerCase()] || "application/octet-stream";
 };
 
+const getCover = (name) => {
+  const { base } = path.parse(name);
+  return `http://localhost:3000/common/cover/${base}`;
+};
+
 export {
   validate,
   filterImgFile,
   isImgFile,
-  idArchiveFile,
+  isArchiveFile,
   copyCoverToMetadata,
   writeCoverToMetadata,
   readImageFromDir,
   readImageFromAcrchive,
   getContentType,
+  getCover,
 };

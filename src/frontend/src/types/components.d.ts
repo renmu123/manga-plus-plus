@@ -7,14 +7,22 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
-    FileBrowser: typeof import('./../components/fileBrowser/index.vue')['default']
+    ComicCard: typeof import('./../components/comicCard.vue')['default']
+    FileBrowser: typeof import("./../components/fileBrowser/index.vue")["default"]
     FileBrowserDialog: typeof import('./../components/fileBrowserDialog/index.vue')['default']
-    HelloWorld: typeof import('./../components/HelloWorld.vue')['default']
+    HelloWorld: typeof import("./../components/HelloWorld.vue")["default"]
+    LibraryCard: typeof import('./../components/libraryCard.vue')['default']
     NButton: typeof import('naive-ui')['NButton']
-    NCalendar: typeof import('naive-ui')['NCalendar']
+    NCalendar: typeof import("naive-ui")["NCalendar"]
     NCard: typeof import('naive-ui')['NCard']
-    NIcon: typeof import('naive-ui')['NIcon']
+    NForm: typeof import('naive-ui')['NForm']
+    NFormItem: typeof import('naive-ui')['NFormItem']
+    NIcon: typeof import("naive-ui")["NIcon"]
+    NInput: typeof import('naive-ui')['NInput']
     NModal: typeof import('naive-ui')['NModal']
+    NPopover: typeof import('naive-ui')['NPopover']
+    NSwitch: typeof import('naive-ui')['NSwitch']
+    NUpload: typeof import('naive-ui')['NUpload']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

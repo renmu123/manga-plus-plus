@@ -9,17 +9,17 @@ import AdmZip from "adm-zip";
 
 import comicSerice from "./comic.js";
 import chapterService from "./chapter.js";
-import { isImgFile, idArchiveFile, readImageFromDir } from "../utils/index.js";
+import { isImgFile, isArchiveFile, readImageFromDir } from "../utils/index.js";
 import comic from "./comic.js";
 
-const getLibrary = async (id) => {
+const getLibrary = async (id, includeComics = false, includeConfig = false) => {
   const post = await prisma.library.findUnique({
     where: {
       id: id,
     },
     include: {
-      comics: true,
-      config: true,
+      comics: includeComics,
+      config: includeConfig,
     },
   });
   return post;
@@ -45,9 +45,18 @@ const getLibrarys = async (data, queryConfig = false) => {
 };
 
 const editLibrary = async (id, data) => {
+  if (data.config) {
+    data["config"] = {
+      update: data.config,
+    };
+  }
+
   const post = await prisma.library.update({
     where: { id },
     data: data,
+    include: {
+      config: true,
+    },
   });
   return post;
 };
@@ -106,7 +115,7 @@ const scanLibrary = async (libraryId) => {
         const fileStat = await fs.stat(filePath2);
 
         if (fileStat.isFile()) {
-          if (!idArchiveFile(file)) {
+          if (!isArchiveFile(file)) {
             continue;
           }
 

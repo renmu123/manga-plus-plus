@@ -16,12 +16,12 @@ const router = createRouter({
       component: () => import("@/views/Dashboard/index.vue"),
     },
     {
-      path: "/library",
+      path: "/library/:id",
       name: "library",
       component: () => import("@/views/Library/index.vue"),
     },
     {
-      path: "/comic",
+      path: "/comic/:id",
       name: "comic",
       component: () => import("@/views/Comic/index.vue"),
     },

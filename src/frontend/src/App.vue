@@ -1,11 +1,13 @@
 <template>
-  <div>
-    <Dashboard></Dashboard>
+  <div class="main-container">
+    <RouterView />
   </div>
 </template>
 
-<script setup lang="ts">
-import Dashboard from "@/views/Dashboard/index.vue";
-</script>
+<script setup lang="ts"></script>
 
-<style scoped></style>
+<style scoped lang="scss">
+.main-container {
+  padding: 20px;
+}
+</style>
