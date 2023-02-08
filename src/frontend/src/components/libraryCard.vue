@@ -66,7 +66,11 @@
             </div>
           </n-form-item>
 
-          <n-form-item label="复制封面到元文件夹" path="config.coverCopy">
+          <n-form-item
+            label="复制封面到元文件夹"
+            path="config.coverCopy"
+            label-placement="left"
+          >
             <n-switch v-model:value="detail.config.coverCopy" />
           </n-form-item>
           <!-- <n-form-item

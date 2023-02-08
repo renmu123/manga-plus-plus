@@ -66,11 +66,20 @@ router.post(
       throw new Error("status状态值仅限1，2，3");
     }
 
-    const data = req.body;
-    data.status = status;
-    data.readingStatus = readingStatus;
+    const data = {
+      id: req.body.id,
+      cover: req.body.cover,
+      inReadList: req.body.inReadList,
+      name: req.body.name,
+      publish: req.body.publish,
+      publishTime: req.body.publishTime,
+      readingStatus: req.body.readingStatus,
+      summary: req.body.summary,
+      tags: req.body.tags,
+      authors: req.body.authors,
+    };
 
-    const post = await comic.updateComic(id, req.body);
+    const post = await comic.updateComic(id, data);
 
     res.json(post);
   }

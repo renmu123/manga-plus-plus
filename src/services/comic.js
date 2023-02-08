@@ -86,14 +86,14 @@ const removeComic = async (id) => {
 const updateComic = async (id, data) => {
   if (data.tags) {
     data["tags"] = {
-      connect: data.tags.map((tagId) => {
+      set: data.tags.map((tagId) => {
         return { id: tagId };
       }),
     };
   }
   if (data.authors) {
     data["authors"] = {
-      connect: data.authors.map((id) => {
+      set: data.authors.map((id) => {
         return { id: id };
       }),
     };

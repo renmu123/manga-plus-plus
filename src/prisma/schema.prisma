@@ -13,7 +13,7 @@ datasource db {
 // 作者
 model Author {
   id Int @id @default(autoincrement())
-  name String
+  name String @unique
   comics Comic[]
 }
 
@@ -78,7 +78,7 @@ model Chapter{
 // 标签
 model Tag {
   id Int @id @default(autoincrement())
-  name String // 名称
+  name String @unique // 名称
   comics Comic[]
 }
 

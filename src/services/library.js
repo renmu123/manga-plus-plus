@@ -7,19 +7,18 @@ import path from "path";
 import { keyBy, uniqBy, merge } from "lodash-es";
 import AdmZip from "adm-zip";
 
-import comicSerice from "./comic.js";
+import comicService from "./comic.js";
 import chapterService from "./chapter.js";
 import { isImgFile, isArchiveFile, readImageFromDir } from "../utils/index.js";
-import comic from "./comic.js";
 
-const getLibrary = async (id, includeComics = false, includeConfig = false) => {
+const getLibrary = async (id, include = {}) => {
   const post = await prisma.library.findUnique({
     where: {
       id: id,
     },
     include: {
-      comics: includeComics,
-      config: includeConfig,
+      comics: include.comics ?? false,
+      config: include.config ?? false,
     },
   });
   return post;
@@ -146,7 +145,7 @@ const scanLibrary = async (libraryId) => {
   }
 
   // 移除不存在的comic以及chapter
-  const comics = await comic.getComics(libraryId, true);
+  const comics = await comicService.getComics(libraryId, true);
   for (const comicData of comics) {
     if (existsSync(comicData.dir)) {
       for (const chapterData of comicData.chapters) {
@@ -155,7 +154,7 @@ const scanLibrary = async (libraryId) => {
         }
       }
     } else {
-      await comic.removeComic(comicData.id);
+      await comicService.removeComic(comicData.id);
     }
   }
   console.log(data2);
@@ -170,7 +169,7 @@ const scanLibrary = async (libraryId) => {
       },
     });
     if (!post) {
-      post = await comic.addComic({
+      post = await comicService.addComic({
         name: name,
         libraryId: libraryId,
         dir: path.join(dir, name),
@@ -201,7 +200,7 @@ const scanLibrary = async (libraryId) => {
 
 // scan cover
 const scanCover = async (libraryId) => {
-  const comics = await comicSerice.getComics(libraryId);
+  const comics = await comicService.getComics(libraryId);
   const libraryConfig = await getLibraryConfig(libraryId);
 
   const chapterData = [];
@@ -261,7 +260,7 @@ const scanCover = async (libraryId) => {
   // update comic cover which has not cover,use the chapter cover default.
   for (const comic of uniqBy(chapterData, "comicId")) {
     if (!keyBy(comics, "id")[comic.comicId].cover) {
-      await comicSerice.updateComic(comic.comicId, { cover: comic.cover });
+      await comicService.updateComic(comic.comicId, { cover: comic.cover });
     }
   }
 };

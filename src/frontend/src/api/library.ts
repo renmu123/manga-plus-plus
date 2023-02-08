@@ -21,7 +21,7 @@ const scan = (id: number) => {
   return request.get("/library/scan", { params: { id } });
 };
 const scanCover = (id: number) => {
-  return request.get("/library/list", { params: { id } });
+  return request.get("/library/scanCover", { params: { id } });
 };
 export default {
   add,

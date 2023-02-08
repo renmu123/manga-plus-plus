@@ -30,7 +30,7 @@
     <n-modal v-model:show="editDialogVisible">
       <n-card
         style="width: 600px"
-        title="模态框"
+        title="漫画编辑"
         :bordered="false"
         size="huge"
         role="dialog"
@@ -49,13 +49,7 @@
           <n-form-item label="路径" path="dir">
             <n-input v-model:value="detail.dir" disabled />
           </n-form-item>
-          <n-form-item label="介绍" path="summary">
-            <n-input
-              v-model:value="detail.summary"
-              type="textarea"
-              placeholder="请输入简介"
-            />
-          </n-form-item>
+
           <n-form-item label="封面" path="cover">
             <div style="width: 100%">
               <n-upload
@@ -72,7 +66,53 @@
               />
             </div>
           </n-form-item>
+
+          <n-form-item label="标签" path="tags">
+            <n-dynamic-tags v-model:value="detail.tagsData">
+              <template #input="{ submit, deactivate }">
+                <n-auto-complete
+                  ref="autoCompleteInstRef"
+                  size="small"
+                  v-model:value="inputValue"
+                  :options="tagOptions"
+                  placeholder="输入或选择标签"
+                  :clear-after-select="true"
+                  @select="submit($event)"
+                  @blur="deactivate"
+                  :get-show="() => true"
+                />
+              </template>
+              <template #trigger="{ activate, disabled }">
+                <n-button
+                  size="small"
+                  type="primary"
+                  dashed
+                  @click="activate()"
+                >
+                  添加
+                </n-button>
+              </template>
+            </n-dynamic-tags>
+          </n-form-item>
+          <n-form-item label="作者" path="author">
+            <n-select
+              placeholder="请选择或新建作者"
+              v-model:value="detail.authorsData"
+              filterable
+              multiple
+              tag
+              :options="authorOptions"
+            />
+          </n-form-item>
+          <n-form-item label="简介" path="summary">
+            <n-input
+              v-model:value="detail.summary"
+              type="textarea"
+              placeholder="请输入简介"
+            />
+          </n-form-item>
         </n-form>
+
         <template #footer>
           <div class="footer">
             <n-button attr-type="button" @click="editDialogVisible = false">
@@ -94,9 +134,10 @@
 </template>
 
 <script setup lang="ts">
-import { comic, common } from "@/api";
+import { comic, common, tag, author } from "@/api";
 import type { Comic } from "@/types/index";
 import { DehazeFilled } from "@vicons/material";
+import { keyBy, cloneDeep } from "lodash-es";
 import { UploadCustomRequestOptions } from "naive-ui";
 
 export interface Props {
@@ -104,10 +145,6 @@ export interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {});
-
-// const scan = async () => {
-//   await comic.scan(props.data.id);
-// };
 
 const uploadUrl = computed(
   () => `${import.meta.env.VITE_API_URL}/common/cover/upload`
@@ -117,14 +154,18 @@ const detail = ref<Comic>({});
 const edit = async () => {
   const res = await comic.query(props.data.id);
   detail.value = res.data;
+  detail.value.tagsData = detail.value.tags.map((item) => item.name);
+  detail.value.authorsData = detail.value.authors.map((item) => item.name);
 
   editDialogVisible.value = true;
+  getTagList();
+  getAuthorList();
 };
 
 const rules = ref({
   name: {
     required: true,
-    message: "请输入库名称",
+    message: "请输入名称",
     trigger: "blur",
   },
   cover: {
@@ -135,11 +176,173 @@ const rules = ref({
   config: {},
 });
 
+const inputValue = ref("");
+
 const confirm = async () => {
-  await comic.edit(detail.value);
+  const data = cloneDeep(detail.value);
+
+  //////////// tag
+  const createdTagIds = (data.tagsData || [])
+    .map((name) => {
+      return tagMap.value[name]?.id;
+    })
+    .filter((id) => {
+      return !!id;
+    });
+  const unCreatedTag = (data.tagsData || []).filter((name) => {
+    return !tagMap.value[name];
+  });
+  let newCreateTagIds = [];
+  if (unCreatedTag.length !== 0) {
+    // 新建缺少的tag
+    const res = await tag.addMany({ names: unCreatedTag });
+    newCreateTagIds = res.data.map((item: { id: number }) => item.id);
+  }
+  // @ts-ignore
+  data.tags = createdTagIds.concat(newCreateTagIds);
+  delete data.tagsData;
+
+  ///////////// author
+  const createdAuthorIds = (data.authorsData || [])
+    .map((name) => {
+      return authorMap.value[name]?.id;
+    })
+    .filter((id) => {
+      return !!id;
+    });
+  const unCreatedAuthor = (data.authorsData || []).filter((name) => {
+    return !authorMap.value[name];
+  });
+  let newCreateAuthorIds = [];
+  if (unCreatedAuthor.length !== 0) {
+    // 新建缺少的author
+    const res = await author.addMany({ names: unCreatedAuthor });
+    newCreateAuthorIds = res.data.map((item: { id: number }) => item.id);
+  }
+  // @ts-ignore
+  data.authors = createdAuthorIds.concat(newCreateAuthorIds);
+  delete data.authorsData;
+
+  // 提交
+  await comic.edit(data);
   editDialogVisible.value = false;
-  // comic.scan(props.data.id);
 };
+
+// 标签
+const tagList = ref<{ id: number; name: string }[]>([]);
+const tagOptions = computed(() => {
+  const data = tagList.value
+    .map((tag) => {
+      return {
+        label: tag.name,
+        value: tag.name,
+      };
+    })
+    .filter((item) => {
+      if ((detail.value.tagsData || []).includes(item.value)) {
+        return false;
+      }
+      return true;
+    });
+
+  if (inputValue.value !== null) {
+    data.unshift({ label: inputValue.value, value: inputValue.value });
+  }
+
+  return data;
+});
+const tagMap = computed(() => {
+  return keyBy(tagList.value, "name");
+});
+const getTagList = async () => {
+  const res = await tag.list();
+  tagList.value = res.data;
+};
+
+// 作者
+const authorList = ref<{ id: number; name: string }[]>([]);
+const authorOptions = computed(() => {
+  const data = authorList.value
+    .map((author) => {
+      return {
+        label: author.name,
+        value: author.name,
+      };
+    })
+    .filter((item) => {
+      if ((detail.value.authorsData || []).includes(item.value)) {
+        return false;
+      }
+      return true;
+    });
+
+  return data;
+});
+const authorMap = computed(() => {
+  return keyBy(authorList.value, "name");
+});
+const getAuthorList = async () => {
+  const res = await author.list();
+  authorList.value = res.data;
+};
+const multipleSelectValue = ref();
+const options = ref([
+  {
+    label: "Everybody's Got Something to Hide Except Me and My Monkey",
+    value: "song0",
+    disabled: true,
+  },
+  {
+    label: "Drive My Car",
+    value: "song1",
+  },
+  {
+    label: "Norwegian Wood",
+    value: "song2",
+  },
+  {
+    label: "You Won't See",
+    value: "song3",
+    disabled: true,
+  },
+  {
+    label: "Nowhere Man",
+    value: "song4",
+  },
+  {
+    label: "Think For Yourself",
+    value: "song5",
+  },
+  {
+    label: "The Word",
+    value: "song6",
+  },
+  {
+    label: "Michelle",
+    value: "song7",
+    disabled: true,
+  },
+  {
+    label: "What goes on",
+    value: "song8",
+  },
+  {
+    label: "Girl",
+    value: "song9",
+  },
+  {
+    label: "I'm looking through you",
+    value: "song10",
+  },
+  {
+    label: "In My Life",
+    value: "song11",
+  },
+  {
+    label: "Wait",
+    value: "song12",
+  },
+]);
 
 const customRequest = ({
   file,

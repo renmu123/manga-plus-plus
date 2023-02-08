@@ -20,4 +20,8 @@ export interface Comic {
   summary: string;
   inReadList: boolean;
   readingStatus: number;
+  tags: { id: number; name: string }[];
+  tagsData?: string[];
+  authors: { id: number; name: string }[];
+  authorsData?: string[];
 }

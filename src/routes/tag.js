@@ -10,35 +10,61 @@ const router = express.Router();
 
 router.post("/add", validate([body("name").isString()]), async (req, res) => {
   const post = await prisma.tag.create({
-    data: req.body,
+    data: {
+      name: req.body.name,
+    },
   });
   res.json(post);
 });
 
 router.post(
-  "/remove",
-  validate([body("id").isInt().toInt()]),
+  "/addMany",
+  validate([body("names").isArray()]),
   async (req, res) => {
-    const { id } = req.body;
-    const post = await prisma.tag.delete({
-      where: { id },
-    });
-    res.json(post);
+    let data = Array.from(new Set(req.body.names));
+    data = data
+      .filter((name) => {
+        if (name) {
+          return true;
+        }
+      })
+      .map((name) => {
+        return { name: name };
+      });
+
+    const inserts = [];
+    for (const item of data) {
+      inserts.push(prisma.tag.create({ data: item }));
+    }
+    const posts = await prisma.$transaction(inserts);
+    res.json(posts);
   }
 );
 
-router.post(
-  "/edit",
-  validate([body("id").isInt().toInt()]),
-  async (req, res) => {
-    const { id } = req.body;
-    const post = await prisma.tag.update({
-      where: { id },
-      data: req.body,
-    });
-    res.json(post);
-  }
-);
+// router.post(
+//   "/remove",
+//   validate([body("id").isInt().toInt()]),
+//   async (req, res) => {
+//     const { id } = req.body;
+//     const post = await prisma.tag.delete({
+//       where: { id },
+//     });
+//     res.json(post);
+//   }
+// );
+
+// router.post(
+//   "/edit",
+//   validate([body("id").isInt().toInt()]),
+//   async (req, res) => {
+//     const { id } = req.body;
+//     const post = await prisma.tag.update({
+//       where: { id },
+//       data: req.body,
+//     });
+//     res.json(post);
+//   }
+// );
 
 router.get(
   "/query/:id",

@@ -76,11 +76,10 @@ router.get(
     query("includeConfig").default(false).isBoolean(),
   ]),
   async (req, res) => {
-    const post = await library.getLibrary(
-      req.params.id,
-      req.query.includeComics,
-      req.query.includeConfig
-    );
+    const post = await library.getLibrary(req.params.id, {
+      comics: req.query.includeComics,
+      config: req.query.includeConfig,
+    });
     if (post.cover) {
       post.cover = getCover(post.cover);
     }
