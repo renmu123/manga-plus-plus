@@ -150,6 +150,7 @@ const uploadUrl = computed(
   () => `${import.meta.env.VITE_API_URL}/common/cover/upload`
 );
 const editDialogVisible = ref(false);
+// @ts-ignore
 const detail = ref<Comic>({});
 const edit = async () => {
   const res = await comic.query(props.data.id);

@@ -98,8 +98,6 @@ const confirm = () => {
   close();
 };
 
-// const currentPath = ref("\\Users");
-
 const data = ref({ list: [], parent: "" });
 
 const getData = async (path: string) => {

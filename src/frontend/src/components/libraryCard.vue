@@ -120,6 +120,7 @@ const uploadUrl = computed(
   () => `${import.meta.env.VITE_API_URL}/common/cover/upload`
 );
 const editDialogVisible = ref(false);
+// @ts-ignore
 const detail = ref<Library>({});
 const edit = async () => {
   const res = await library.query(props.data.id, { includeConfig: true });

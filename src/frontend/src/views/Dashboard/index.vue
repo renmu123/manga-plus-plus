@@ -25,7 +25,6 @@ const libraryList = ref<Library[]>([]);
 const getLibraryList = async () => {
   const res = await library.list();
   libraryList.value = res.data;
-  console.log(libraryList.value);
 };
 
 getLibraryList();
