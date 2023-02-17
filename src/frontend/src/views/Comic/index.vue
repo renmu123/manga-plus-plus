@@ -28,13 +28,47 @@
         <p class="summary">简介：{{ detail.summary }}</p>
       </div>
     </div>
-    <div class="chapter-content"></div>
+    <div class="chapter-content">
+      <div v-if="chapters['1']">
+        <h2>卷</h2>
+        <chapterCard
+          v-for="chapter in chapters['1']"
+          :key="chapter.id"
+          :data="chapter"
+        >
+          {{ chapter.name }}
+        </chapterCard>
+      </div>
+      <div v-if="chapters['2']">
+        <h2>连载</h2>
+        <chapterCard
+          v-for="chapter in chapters['2']"
+          :key="chapter.id"
+          :data="chapter"
+        >
+          {{ chapter.name }}
+        </chapterCard>
+      </div>
+      <div v-if="chapters['3']">
+        <h2>番外</h2>
+        <chapterCard
+          v-for="chapter in chapters['3']"
+          :key="chapter.id"
+          :data="chapter"
+        >
+          {{ chapter.name }}
+        </chapterCard>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { comic } from "@/api";
 import type { Comic } from "@/types/index";
+import chapterCard from "@/components/chapterCard.vue";
+
+import { groupBy } from "lodash-es";
 
 const route = useRoute();
 const router = useRouter();
@@ -51,6 +85,10 @@ const getDetail = async () => {
   });
   detail.value = res.data;
 };
+
+const chapters = computed(() => {
+  return groupBy(detail.value.chapters, "category");
+});
 
 getDetail();
 

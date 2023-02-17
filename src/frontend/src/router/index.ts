@@ -25,6 +25,16 @@ const router = createRouter({
       name: "comic",
       component: () => import("@/views/Comic/index.vue"),
     },
+    {
+      path: "/chapter/:id",
+      name: "chapter",
+      component: () => import("@/views/Chapter/index.vue"),
+    },
+    {
+      path: "/chapter/images/:id",
+      name: "images",
+      component: () => import("@/views/ImageView/index.vue"),
+    },
   ],
 });
 

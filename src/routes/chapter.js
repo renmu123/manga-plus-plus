@@ -9,6 +9,7 @@ import {
   readImageFromDir,
   readImageFromAcrchive,
   getContentType,
+  getCover,
 } from "../utils/index.js";
 import chapter from "../services/chapter.js";
 
@@ -39,10 +40,16 @@ router.post(
   validate([body("id").isInt().toInt()]),
   async (req, res) => {
     const { id } = req.body;
-    const data = req.body;
-    delete data.type;
 
-    const post = await chapter.updateChapter(id, req.body);
+    const data = {
+      id: id,
+      name: req.body.name,
+      cover: req.body.cover,
+      summary: req.body.summary,
+      sort: req.body.sort,
+      category: req.body.category,
+    };
+    const post = await chapter.updateChapter(id, data);
     // TODO:更新chapter名称时，源文件名称也会修改
 
     res.json(post);
@@ -64,6 +71,10 @@ router.get(
       imageFiles = readImageFromAcrchive(post.dir);
     }
 
+    if (post.cover) {
+      post.cover = getCover(post.cover);
+    }
+
     res.json({
       ...post,
       totalImage: imageFiles.length,
@@ -75,11 +86,11 @@ router.get(
   "/query/:id/images",
   validate([
     param("id").isInt().toInt(),
-    query("page").isInt().toInt(),
+    query("start").default(0).isInt().toInt(),
     query("offset").isInt().toInt(),
   ]),
   async (req, res) => {
-    const page = req.query.page;
+    const start = req.query.start;
 
     const post = await chapter.getChapter(req.params.id);
     let imageFiles = [];
@@ -89,7 +100,10 @@ router.get(
     } else if (post.type === "file") {
       imageFiles = readImageFromAcrchive(post.dir).map((item) => item.name);
     }
-    const data = imageFiles.slice(page, page + req.query.offset);
+    let data = imageFiles.slice(start, start + req.query.offset);
+    data = data.map((name) => {
+      return `http://localhost:3000/chapter/query/${req.params.id}/image/${name}`;
+    });
     res.json({
       data: data,
       pagination: {

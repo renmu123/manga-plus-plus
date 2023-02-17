@@ -184,6 +184,14 @@ const scanLibrary = async (libraryId) => {
         },
       });
       if (!post2) {
+        let category = 1;
+        if (chapter.name.includes("卷")) {
+          category = 1;
+        } else if (chapter.name.includes("话")) {
+          category = 2;
+        } else if (chapter.name.includes("番外")) {
+          category = 3;
+        }
         await chapterService.addChapter({
           name: chapter.name,
           comicId: post.id,

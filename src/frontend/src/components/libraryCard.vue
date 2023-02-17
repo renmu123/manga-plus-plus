@@ -190,7 +190,7 @@ watch(editDialogVisible, (newVal) => {
   flex-direction: column;
   justify-content: center;
   text-align: center;
-  margin-left: 15px;
+  margin-right: 15px;
 }
 .library-content {
   width: 150px;

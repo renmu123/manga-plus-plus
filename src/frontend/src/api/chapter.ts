@@ -1,1 +1,22 @@
 import request from "./axios";
+
+const edit = (data: { name: string }) => {
+  return request.post("/chapter/edit", data);
+};
+
+const query = (id: number, params = {}) => {
+  return request.get(`/chapter/query/${id}`, { params });
+};
+const list = (params: any = {}) => {
+  return request.get("/chapter/list", { params });
+};
+
+const getImages = (id: number, params: any = {}) => {
+  return request.get(`/chapter/query/${id}/images`, { params });
+};
+export default {
+  edit,
+  query,
+  list,
+  getImages,
+};

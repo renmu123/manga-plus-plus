@@ -7,6 +7,7 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    ChapterCard: typeof import('./../components/chapterCard.vue')['default']
     ComicCard: typeof import('./../components/comicCard.vue')['default']
     FileBrowser: typeof import("./../components/fileBrowser/index.vue")["default"]
     FileBrowserDialog: typeof import('./../components/fileBrowserDialog/index.vue')['default']
@@ -23,6 +24,7 @@ declare module '@vue/runtime-core' {
     NFormItem: typeof import('naive-ui')['NFormItem']
     NIcon: typeof import('naive-ui')['NIcon']
     NInput: typeof import('naive-ui')['NInput']
+    NInputNumber: typeof import('naive-ui')['NInputNumber']
     NModal: typeof import('naive-ui')['NModal']
     NPopover: typeof import('naive-ui')['NPopover']
     NSelect: typeof import('naive-ui')['NSelect']

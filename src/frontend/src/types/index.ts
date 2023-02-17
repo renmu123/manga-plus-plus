@@ -24,4 +24,17 @@ export interface Comic {
   tagsData?: string[];
   authors: { id: number; name: string }[];
   authorsData?: string[];
+  chapters?: any[];
+}
+
+export interface Chapter {
+  id: number;
+  name: string;
+  dir: string;
+  type: string;
+  comicId: number;
+  cover: string;
+  summary: string;
+  sort: number;
+  category: number;
 }

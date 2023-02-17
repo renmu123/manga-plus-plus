@@ -142,6 +142,14 @@ router.get(
     if (post.cover) {
       post.cover = getCover(post.cover);
     }
+    if (post.chapters) {
+      post.chapters = post.chapters.map((item) => {
+        if (item.cover) {
+          item.cover = getCover(item.cover);
+        }
+        return item;
+      });
+    }
     res.json(post);
   }
 );

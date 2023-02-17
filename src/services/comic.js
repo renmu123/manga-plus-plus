@@ -48,7 +48,6 @@ const getComics = async (
       });
     }
   }
-  console.log(queryData);
   const post = await prisma.comic.findMany(queryData);
   return post;
 };
