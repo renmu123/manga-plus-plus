@@ -23,7 +23,12 @@
         </n-popover>
       </div>
     </div>
-    <router-link :to="{ name: 'comic', params: { id: data.id } }">
+    <router-link
+      :to="{
+        name: 'comic',
+        params: { id: data.id, libraryId: libraryId },
+      }"
+    >
       {{ data.name }}
     </router-link>
 
@@ -142,6 +147,7 @@ import { UploadCustomRequestOptions } from "naive-ui";
 
 export interface Props {
   data: Comic;
+  libraryId: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {});

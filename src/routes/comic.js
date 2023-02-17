@@ -91,12 +91,29 @@ router.get(
     query("libraryId").isInt().toInt(),
     query("idCursor").default(0).isInt().toInt(),
     query("size").default(50).isInt().toInt(),
+    query("tags").default("").isString(),
+    query("authors").default("").isString(),
   ]),
   async (req, res) => {
-    let posts = await comic.getComics(req.query.libraryId, false, {
-      size: req.query.size,
-      idCursor: req.query.idCursor,
-    });
+    const filter = {
+      tags: req.query.tags
+        .split(",")
+        .filter((val) => val)
+        .map(Number),
+      authors: req.query.authors
+        .split(",")
+        .filter((val) => val)
+        .map(Number),
+    };
+    let posts = await comic.getComics(
+      req.query.libraryId,
+      {},
+      {
+        size: req.query.size,
+        idCursor: req.query.idCursor,
+      },
+      filter
+    );
 
     posts = posts.map((item) => {
       if (item.cover) {

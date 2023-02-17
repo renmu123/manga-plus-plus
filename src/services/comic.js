@@ -3,41 +3,54 @@ import { isEmpty } from "lodash-es";
 
 const getComics = async (
   libraryId,
-  includeChapters = false,
-  pagination = {}
+  include = {},
+  pagination = {},
+  filter = {}
 ) => {
-  if (isEmpty(pagination)) {
-    const post = await prisma.comic.findMany({
-      where: {
-        libraryId: libraryId,
-      },
-      include: {
-        chapters: includeChapters,
-      },
-    });
-    return post;
-  } else {
-    const queryData = {
-      take: pagination.size,
-      skip: 1,
-      cursor: {
-        id: pagination.idCursor,
-      },
-      where: {
-        libraryId: libraryId,
-      },
-      include: {
-        chapters: includeChapters,
-      },
+  const queryData = {
+    where: {
+      AND: [
+        {
+          libraryId: libraryId,
+        },
+      ],
+    },
+    include: {
+      chapters: include.chapters ?? false,
+    },
+  };
+
+  if (!isEmpty(pagination)) {
+    queryData.take = pagination.size;
+    queryData.skip = 1;
+    queryData.cursor = {
+      id: pagination.idCursor,
     };
 
     if (!pagination.idCursor) {
       delete queryData.skip;
       delete queryData.cursor;
     }
-    const post = await prisma.comic.findMany(queryData);
-    return post;
   }
+  if (!isEmpty(filter)) {
+    if (filter.tags && filter.tags.length !== 0) {
+      queryData.where.AND.push({
+        tags: {
+          some: { id: { in: filter.tags } },
+        },
+      });
+    }
+    if (filter.authors && filter.authors.length !== 0) {
+      queryData.where.AND.push({
+        authors: {
+          some: { id: { in: filter.authors } },
+        },
+      });
+    }
+  }
+  console.log(queryData);
+  const post = await prisma.comic.findMany(queryData);
+  return post;
 };
 
 const getComic = async (id, include = {}) => {

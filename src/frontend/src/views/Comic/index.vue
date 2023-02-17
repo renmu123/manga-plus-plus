@@ -10,7 +10,7 @@
             v-for="author in detail.authors"
             :key="author.id"
             class="author-name"
-            @click="search({ author: author.id })"
+            @click="search({ authors: author.id })"
             >{{ author.name }}&nbsp;
           </span>
         </p>
@@ -20,7 +20,7 @@
             v-for="tag in detail.tags"
             :key="tag.id"
             class="tag-name"
-            @click="search({ tag: tag.id })"
+            @click="search({ tags: tag.id })"
             >{{ tag.name }}&nbsp;
           </span>
         </p>
@@ -37,6 +37,7 @@ import { comic } from "@/api";
 import type { Comic } from "@/types/index";
 
 const route = useRoute();
+const router = useRouter();
 
 const id = Number(route.params.id);
 
@@ -53,7 +54,9 @@ const getDetail = async () => {
 
 getDetail();
 
-const search = (data) => {};
+const search = (data: any) => {
+  router.push({ name: "library", query: data });
+};
 </script>
 
 <style scoped lang="scss">

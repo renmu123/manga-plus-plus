@@ -145,7 +145,7 @@ const scanLibrary = async (libraryId) => {
   }
 
   // 移除不存在的comic以及chapter
-  const comics = await comicService.getComics(libraryId, true);
+  const comics = await comicService.getComics(libraryId, { chapters: true });
   for (const comicData of comics) {
     if (existsSync(comicData.dir)) {
       for (const chapterData of comicData.chapters) {

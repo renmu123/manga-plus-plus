@@ -7,7 +7,7 @@
     "start": "nodemon server.js",
     "db:migrate": "npx prisma migrate dev --schema ./src/prisma/schema.prisma",
     "db:push": "npx prisma db push --schema ./src/prisma/schema.prisma",
-    "db:studio": "npx prisma studio"
+    "db:studio": "npx prisma studio --schema ./src/prisma/schema.prisma"
   },
   "author": "",
   "license": "MIT",

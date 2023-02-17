@@ -72,7 +72,7 @@ model Chapter{
   createdAt DateTime @default(now())
   summary String? // 简介
   sort Int @default(0) // 排序
-  category String?  // 分类
+  category Int @default(1)  // 分类，1：单行本，2：连载，3：番外
 }
 
 // 标签
