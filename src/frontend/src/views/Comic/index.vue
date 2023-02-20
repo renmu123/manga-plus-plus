@@ -35,6 +35,7 @@
           v-for="chapter in chapters['1']"
           :key="chapter.id"
           :data="chapter"
+          @update="getDetail"
         >
           {{ chapter.name }}
         </chapterCard>
@@ -45,6 +46,7 @@
           v-for="chapter in chapters['2']"
           :key="chapter.id"
           :data="chapter"
+          @update="getDetail"
         >
           {{ chapter.name }}
         </chapterCard>
@@ -55,6 +57,7 @@
           v-for="chapter in chapters['3']"
           :key="chapter.id"
           :data="chapter"
+          @update="getDetail"
         >
           {{ chapter.name }}
         </chapterCard>

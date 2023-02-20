@@ -2,6 +2,7 @@ import express from "express";
 import "express-async-errors";
 import fs from "fs-extra";
 import path from "path";
+import AdmZip from "adm-zip";
 
 import validator from "express-validator";
 import validate from "../utils/valid.js";
@@ -29,9 +30,29 @@ router.post(
   validate([body("id").isInt().toInt()]),
   async (req, res) => {
     const { id } = req.body;
-    // TODO:delete local files
     const post = await chapter.removeChapter(id);
+    fs.removeSync(post.dir);
+    fs.removeSync(post.cover);
+
     res.json(post);
+  }
+);
+
+router.post(
+  "/download",
+  validate([body("id").isInt().toInt()]),
+  async (req, res) => {
+    const { id } = req.body;
+    const post = await chapter.getChapter(id);
+
+    if (post.type === "file") {
+      res.download(post.dir);
+    } else {
+      const zip = new AdmZip();
+      zip.writeZip(post.dir);
+
+      res.send(zip.toBuffer());
+    }
   }
 );
 

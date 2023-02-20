@@ -217,8 +217,7 @@ const scanCover = async (libraryId) => {
     for (const chapter of chapters) {
       if (chapter.cover) continue;
       if (chapter.type === "folder") {
-        const cover = await readImageFromDir(chapter.dir)[0];
-
+        const cover = (await readImageFromDir(chapter.dir))[0];
         if (cover) {
           let coverPath = path.join(chapter.dir, cover);
           if (libraryConfig.coverCopy) {
@@ -258,7 +257,7 @@ const scanCover = async (libraryId) => {
       }
     }
   }
-  console.log(chapterData);
+  console.log("chapterData", chapterData);
 
   // update chapter cover
   for (const chapter of chapterData) {

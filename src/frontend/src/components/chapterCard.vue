@@ -1,9 +1,9 @@
 <template>
   <div class="chapter-card">
     <div
-      class="chapter-content"
+      class="chapter-data"
       :style="{
-        backgroundImage: `url(${data.cover})`,
+        backgroundImage: `url(${data.coverPath})`,
       }"
     >
       <div class="wrapper">
@@ -17,6 +17,9 @@
           </template>
 
           <div class="item-container">
+            <div class="item" @click="remove">删除</div>
+            <a href="http://" target="_blank" rel="noopener noreferrer"></a>
+            <div class="item" @click="download">下载</div>
             <div class="item" @click="edit">编辑</div>
           </div>
         </n-popover>
@@ -116,14 +119,16 @@
 import { common, chapter } from "@/api";
 import type { Chapter } from "@/types/index";
 import { DehazeFilled } from "@vicons/material";
-import { keyBy, cloneDeep } from "lodash-es";
+import { cloneDeep } from "lodash-es";
 import { UploadCustomRequestOptions } from "naive-ui";
+import { saveAs } from "file-saver";
 
 export interface Props {
   data: Chapter;
 }
 
 const props = withDefaults(defineProps<Props>(), {});
+const emits = defineEmits(["update"]);
 
 const uploadUrl = computed(
   () => `${import.meta.env.VITE_API_URL}/common/cover/upload`
@@ -198,6 +203,36 @@ watch(editDialogVisible, (newVal) => {
     // 关闭弹框
   }
 });
+
+const download = async () => {
+  if (props.data.type === "folder") {
+    notification.success({
+      content: "下载的章节为文件夹形式，等待服务器压缩中，请稍后",
+    });
+  }
+  const res = await chapter.download(props.data.id);
+  const fileName = (res.headers["content-disposition"] ?? "").split(
+    "filename*=UTF-8''"
+  )[1];
+  const file = new File([res.data], decodeURI(escape(fileName)));
+  saveAs(file);
+};
+
+const dialog = useDialog();
+const notification = useNotification();
+const remove = async () => {
+  dialog.warning({
+    title: "你确定删除该章节？",
+    content: "删除后本地文件也会被删除，无法找回",
+    positiveText: "确定",
+    negativeText: "取消",
+    onPositiveClick: async () => {
+      await chapter.remove(props.data.id);
+      emits("update");
+      notification.success({ content: "删除成功" });
+    },
+  });
+};
 </script>
 
 <style scoped lang="scss">
@@ -208,7 +243,7 @@ watch(editDialogVisible, (newVal) => {
   text-align: center;
   margin-right: 15px;
 }
-.chapter-content {
+.chapter-data {
   width: 100px;
   height: 141px;
   // background-color: skyblue;
@@ -237,7 +272,7 @@ watch(editDialogVisible, (newVal) => {
     }
   }
 }
-.chapter-content:hover .wrapper {
+.chapter-data:hover .wrapper {
   display: block;
 }
 .footer {

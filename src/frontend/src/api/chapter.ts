@@ -4,6 +4,22 @@ const edit = (data: { name: string }) => {
   return request.post("/chapter/edit", data);
 };
 
+const remove = (id: number) => {
+  return request.post("/chapter/remove", {
+    id,
+  });
+};
+
+const download = (id: number) => {
+  return request.post(
+    "/chapter/download",
+    {
+      id,
+    },
+    { responseType: "blob" }
+  );
+};
+
 const query = (id: number, params = {}) => {
   return request.get(`/chapter/query/${id}`, { params });
 };
@@ -19,4 +35,6 @@ export default {
   query,
   list,
   getImages,
+  remove,
+  download,
 };

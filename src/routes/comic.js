@@ -140,12 +140,12 @@ router.get(
       authors: req.query.includeAuthors,
     });
     if (post.cover) {
-      post.cover = getCover(post.cover);
+      post.coverPath = getCover(post.cover);
     }
     if (post.chapters) {
       post.chapters = post.chapters.map((item) => {
         if (item.cover) {
-          item.cover = getCover(item.cover);
+          item.coverPath = getCover(item.cover);
         }
         return item;
       });

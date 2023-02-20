@@ -16,6 +16,7 @@ export interface Comic {
   // publish: string
   // publishTime: string
   cover: string;
+  coverPath: string;
   status: number;
   summary: string;
   inReadList: boolean;
@@ -34,6 +35,7 @@ export interface Chapter {
   type: string;
   comicId: number;
   cover: string;
+  coverPath: string;
   summary: string;
   sort: number;
   category: number;
