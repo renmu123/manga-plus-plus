@@ -2,7 +2,6 @@ import express from "express";
 import "express-async-errors";
 
 import cors from "cors";
-import morgan from "morgan";
 import fileUpload from "express-fileupload";
 import winston from "winston";
 import expressWinston from "express-winston";
@@ -25,15 +24,9 @@ const __dirname = path.dirname(__filename);
 const hostname = "localhost";
 const port = 3000;
 
-const accessLogStream = fs.createWriteStream(
-  path.join(__dirname, "access.log"),
-  { flags: "a" }
-);
-
 const app = express();
 app.use(cors({ exposedHeaders: ["Content-Disposition"] }));
 app.use(express.json());
-app.use(morgan("combined", { stream: accessLogStream }));
 app.use(fileUpload());
 
 app.use("/comic", comicRouter);
@@ -47,12 +40,20 @@ app.use("/config", configRouter);
 app.use(
   expressWinston.errorLogger({
     transports: [
-      new winston.transports.Console(),
-      new winston.transports.File({ filename: "log.log", level: "debug" }),
+      // new winston.transports.Console(),
+      new winston.transports.File({
+        filename: "info.log",
+        level: "info",
+        maxsize: 5242880,
+      }),
     ],
     format: winston.format.combine(
-      winston.format.colorize(),
-      winston.format.json()
+      // winston.format.colorize(),
+      winston.format.printf((data) => {
+        return `[${data.meta.level}][${data.meta.date}]: ${
+          data.meta.message
+        }\n${JSON.stringify(data)}`;
+      })
     ),
   })
 );

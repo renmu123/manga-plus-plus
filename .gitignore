@@ -7,3 +7,4 @@ access.log
 *.db-journal
 setting.json
 metadata
+*.log

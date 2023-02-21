@@ -172,6 +172,10 @@ router.get(
       tags: req.query.includeTags,
       authors: req.query.includeAuthors,
     });
+
+    if (post) {
+      new Error("不存在该漫画");
+    }
     if (post.cover) {
       post.coverPath = getCover(post.cover);
     }

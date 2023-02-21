@@ -80,6 +80,9 @@ router.get(
       comics: req.query.includeComics,
       config: req.query.includeConfig,
     });
+    if (!post) {
+      throw new Error("不存在该库");
+    }
     if (post.cover) {
       post.cover = getCover(post.cover);
     }

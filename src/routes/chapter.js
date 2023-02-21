@@ -84,6 +84,9 @@ router.get(
     if (!(await fs.pathExists(post.dir))) {
       throw new Error("该路径下不存在章节");
     }
+    if (!post) {
+      new Error("不存在该章节");
+    }
     let imageFiles = [];
     if (post.type === "folder") {
       imageFiles = await readImageFromDir(post.dir);

@@ -23,7 +23,6 @@
     "express-winston": "^4.2.0",
     "fs-extra": "^11.1.0",
     "lodash-es": "^4.17.21",
-    "morgan": "^1.10.0",
     "sqlite3": "^5.1.4",
     "winston": "^3.8.2"
   },
