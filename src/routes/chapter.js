@@ -32,7 +32,6 @@ router.post(
     const { id } = req.body;
     const post = await chapter.removeChapter(id);
     fs.removeSync(post.dir);
-    fs.removeSync(post.cover);
 
     res.json(post);
   }

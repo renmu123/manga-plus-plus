@@ -4,6 +4,8 @@ import "express-async-errors";
 import cors from "cors";
 import morgan from "morgan";
 import fileUpload from "express-fileupload";
+import winston from "winston";
+import expressWinston from "express-winston";
 
 import fs from "fs";
 import path from "path";
@@ -41,6 +43,19 @@ app.use("/tag", tagRouter);
 app.use("/library", libraryRouter);
 app.use("/common", commonRouter);
 app.use("/config", configRouter);
+
+app.use(
+  expressWinston.errorLogger({
+    transports: [
+      new winston.transports.Console(),
+      new winston.transports.File({ filename: "log.log", level: "debug" }),
+    ],
+    format: winston.format.combine(
+      winston.format.colorize(),
+      winston.format.json()
+    ),
+  })
+);
 
 app.get("/", (req, res) => {
   res.send("Hello World");

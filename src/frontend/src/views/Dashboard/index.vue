@@ -6,19 +6,12 @@
       :data="library"
     ></libraryCard>
   </div>
-  <!-- <n-button @click="visible = true"> 添加库 </n-button>
-
-  <fileBrowserDialog
-    v-model:visible="visible"
-    v-model="path"
-  ></fileBrowserDialog> -->
 </template>
 
 <script setup lang="ts">
-import fileBrowserDialog from "@/components/fileBrowserDialog/index.vue";
 import libraryCard from "@/components/libraryCard.vue";
 
-import { library } from "@/api";
+import { library, comic } from "@/api";
 import type { Library } from "@/types/index";
 
 const libraryList = ref<Library[]>([]);
@@ -29,9 +22,14 @@ const getLibraryList = async () => {
 
 getLibraryList();
 
-const visible = ref(true);
+const recentAddComics = ref([]);
 
-const path = ref("/");
+const getComics = async () => {
+  const res = await comic.recentAdded({
+    size: 8,
+  });
+  recentAddComics.value = res.data;
+};
 </script>
 
 <style scoped></style>

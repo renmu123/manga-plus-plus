@@ -35,6 +35,11 @@ const router = createRouter({
       name: "images",
       component: () => import("@/views/ImageView/index.vue"),
     },
+    {
+      path: "/setting",
+      name: "setting",
+      component: () => import("@/views/Setting/index.vue"),
+    },
   ],
 });
 

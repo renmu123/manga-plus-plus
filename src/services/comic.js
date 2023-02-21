@@ -5,19 +5,23 @@ const getComics = async (
   libraryId,
   include = {},
   pagination = {},
-  filter = {}
+  filter = {},
+  orderBy = {}
 ) => {
   const queryData = {
     where: {
       AND: [
         {
           libraryId: libraryId,
+          status: filter.status,
+          readingStatus: filter.readingStatus,
         },
       ],
     },
     include: {
       chapters: include.chapters ?? false,
     },
+    orderBy: orderBy,
   };
 
   if (!isEmpty(pagination)) {

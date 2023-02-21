@@ -112,8 +112,11 @@ export interface Props {
 
 const props = withDefaults(defineProps<Props>(), {});
 
+const notification = useNotification();
 const scan = async () => {
+  notification.warning({ content: "正在扫描中......" });
   await library.scan(props.data.id);
+  notification.success({ content: "扫描完毕" });
 };
 
 const uploadUrl = computed(

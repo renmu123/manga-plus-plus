@@ -109,6 +109,35 @@
               :options="authorOptions"
             />
           </n-form-item>
+          <n-form-item label="阅读状态" path="readingStatus">
+            <n-select
+              placeholder="请选择阅读状态"
+              v-model:value="detail.readingStatus"
+              filterable
+              clearable
+              :options="[
+                { id: 1, name: '未读' },
+                { id: 2, name: '阅读中' },
+                { id: 3, name: '已读' },
+              ]"
+              value-field="id"
+              label-field="name"
+            />
+          </n-form-item>
+          <n-form-item label="连载状态" path="status">
+            <n-select
+              placeholder="请选择连载状态"
+              v-model:value="detail.status"
+              filterable
+              clearable
+              :options="[
+                { id: 1, name: '连载中' },
+                { id: 2, name: '已完结' },
+              ]"
+              value-field="id"
+              label-field="name"
+            />
+          </n-form-item>
           <n-form-item label="简介" path="summary">
             <n-input
               v-model:value="detail.summary"

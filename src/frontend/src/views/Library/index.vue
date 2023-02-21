@@ -23,9 +23,42 @@
       ></comicCard>
     </div>
 
-    <n-drawer v-model:show="filterVisible" :width="360" placement="right">
+    <n-drawer
+      v-model:show="filterVisible"
+      width="min(450px,90%)"
+      placement="right"
+    >
       <n-drawer-content>
         <n-form ref="formRef" label-width="auto" :model="tempFilterData">
+          <n-form-item label="阅读状态">
+            <n-select
+              placeholder="请选择阅读状态"
+              v-model:value="tempFilterData.readingStatus"
+              filterable
+              clearable
+              :options="[
+                { id: 1, name: '未读' },
+                { id: 2, name: '阅读中' },
+                { id: 3, name: '已读' },
+              ]"
+              value-field="id"
+              label-field="name"
+            />
+          </n-form-item>
+          <n-form-item label="连载状态">
+            <n-select
+              placeholder="请选择连载状态"
+              v-model:value="tempFilterData.status"
+              filterable
+              clearable
+              :options="[
+                { id: 1, name: '连载中' },
+                { id: 2, name: '已完结' },
+              ]"
+              value-field="id"
+              label-field="name"
+            />
+          </n-form-item>
           <n-form-item label="标签">
             <n-select
               placeholder="请选择标签"
@@ -128,10 +161,14 @@ const filterVisible = ref(false);
 const tempFilterData = ref({
   authors: [],
   tags: [],
+  readingStatus: undefined,
+  status: undefined,
 });
 const filterData = ref({
   authors: [],
   tags: [],
+  readingStatus: undefined,
+  status: undefined,
 });
 
 watch(
@@ -153,9 +190,11 @@ const openFilterDrawer = () => {
 
 if (route.query) {
   if (route.query.tags) {
+    // @ts-ignore
     filterData.value.tags = route.query.tags.split(",").map(Number);
   }
   if (route.query.authors) {
+    // @ts-ignore
     filterData.value.authors = route.query.authors.split(",").map(Number);
   }
 }
@@ -172,6 +211,8 @@ const filterReset = () => {
   tempFilterData.value = {
     authors: [],
     tags: [],
+    readingStatus: undefined,
+    status: undefined,
   };
 };
 </script>
@@ -179,7 +220,7 @@ const filterReset = () => {
 <style scoped lang="scss">
 .container {
   .search {
-    margin: 0px 15px;
+    // margin: 0px 15px;
     margin-bottom: 40px;
     display: flex;
     align-items: center;

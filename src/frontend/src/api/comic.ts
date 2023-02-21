@@ -21,10 +21,15 @@ const list = (params: {
   return request.get("/comic/list", { params });
 };
 
+const recentAdded = (params: { size: number }) => {
+  return request.get("/comic/recentAdded", { params });
+};
+
 export default {
   add,
   remove,
   edit,
   query,
   list,
+  recentAdded,
 };

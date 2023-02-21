@@ -7,6 +7,7 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    ActionHeader: typeof import('./../components/actionHeader.vue')['default']
     ChapterCard: typeof import('./../components/chapterCard.vue')['default']
     ComicCard: typeof import('./../components/comicCard.vue')['default']
     FileBrowser: typeof import("./../components/fileBrowser/index.vue")["default"]

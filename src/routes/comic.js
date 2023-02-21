@@ -1,5 +1,6 @@
 import express from "express";
 import "express-async-errors";
+import fs from "fs-extra";
 
 import validator from "express-validator";
 import validate from "../utils/valid.js";
@@ -38,14 +39,10 @@ router.post(
   validate([body("id").isInt().toInt()]),
   async (req, res) => {
     const { id } = req.body;
-    const post = prisma.comic.getComic(id);
-
-    await prisma.$transaction([
-      prisma.comic.delete({
-        where: { id },
-      }),
-    ]);
-    // TODO:delete local files
+    const post = prisma.comic.delete({
+      where: { id },
+    });
+    fs.removeSync(post.dir);
 
     res.json({ success: true });
   }
@@ -63,7 +60,7 @@ router.post(
       throw new Error("status状态值仅限1，2");
     }
     if (readingStatus && ![1, 2, 3].includes(readingStatus)) {
-      throw new Error("status状态值仅限1，2，3");
+      throw new Error("readingStatus状态值仅限1，2，3");
     }
 
     const data = {
@@ -91,8 +88,11 @@ router.get(
     query("libraryId").isInt().toInt(),
     query("idCursor").default(0).isInt().toInt(),
     query("size").default(50).isInt().toInt(),
+    query("orderBy").optional().isString(), // 如updatedAt,desc
     query("tags").default("").isString(),
     query("authors").default("").isString(),
+    query("readingStatus").optional().toInt(),
+    query("status").optional().toInt(),
   ]),
   async (req, res) => {
     const filter = {
@@ -104,7 +104,17 @@ router.get(
         .split(",")
         .filter((val) => val)
         .map(Number),
+      status: req.query.status,
+      readingStatus: req.query.readingStatus,
     };
+
+    let orderBy = {};
+    if (req.query.orderBy) {
+      const [name, sort] = req.query.orderBy.split(",");
+      orderBy = {
+        [name]: sort,
+      };
+    }
     let posts = await comic.getComics(
       req.query.libraryId,
       {},
@@ -112,12 +122,35 @@ router.get(
         size: req.query.size,
         idCursor: req.query.idCursor,
       },
-      filter
+      filter,
+      orderBy
     );
 
     posts = posts.map((item) => {
       if (item.cover) {
         item.cover = getCover(item.cover);
+      }
+      return item;
+    });
+    res.json(posts);
+  }
+);
+
+router.get(
+  "/recentAdded",
+  validate([query("size").default(10).isInt().toInt()]),
+  async (req, res) => {
+    let posts = await prisma.comic.findMany({
+      take: req.query.size,
+      skip: 0,
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    posts = posts.map((item) => {
+      if (item.cover) {
+        item.coverPath = getCover(item.cover);
       }
       return item;
     });
