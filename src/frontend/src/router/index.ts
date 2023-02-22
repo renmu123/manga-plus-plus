@@ -1,14 +1,7 @@
-import { createRouter, createWebHistory } from "vue-router";
-// import pool from "./pool";
-// import order from "./order/index";
-// import goods from "./goods/index";
-// import HomeView from "../views/home/index.vue";
-// import LoginView from "../views/login/index.vue";
-// import { userInfoStore } from "../stores/user-store";
-// import { getUserInfo } from "@/assets/js/api/user/info-api";
+import { createRouter, createWebHashHistory } from "vue-router";
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHashHistory(),
   routes: [
     {
       path: "/",

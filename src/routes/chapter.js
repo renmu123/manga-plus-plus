@@ -125,7 +125,7 @@ router.get(
     }
     let data = imageFiles.slice(start, start + req.query.offset);
     data = data.map((name) => {
-      return `http://localhost:3000/chapter/query/${req.params.id}/image/${name}`;
+      return `//localhost:3000/chapter/query/${req.params.id}/image/${name}`;
     });
     res.json({
       data: data,

@@ -9,6 +9,7 @@ import expressWinston from "express-winston";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import dotenv from "dotenv";
 
 import comicRouter from "./src/routes/comic.js";
 import authorRouter from "./src/routes/author.js";
@@ -18,16 +19,19 @@ import libraryRouter from "./src/routes/library.js";
 import commonRouter from "./src/routes/common.js";
 import configRouter from "./src/routes/config.js";
 
+dotenv.config();
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const hostname = "0.0.0.0";
-const port = 3000;
+const hostname = process.env.HOST;
+const port = process.env.PORT;
 
 const app = express();
 app.use(cors({ exposedHeaders: ["Content-Disposition"] }));
 app.use(express.json());
 app.use(fileUpload());
+app.use(express.static(path.join(__dirname, "dist")));
 
 app.use("/api/comic", comicRouter);
 app.use("/api/author", authorRouter);
@@ -59,7 +63,7 @@ app.use(
 );
 
 app.get("/", (req, res) => {
-  res.send("Hello World");
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
 
 // Error handling Middleware function for logging the error message

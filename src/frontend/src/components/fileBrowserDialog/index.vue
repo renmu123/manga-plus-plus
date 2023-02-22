@@ -98,7 +98,13 @@ const confirm = () => {
   close();
 };
 
-const data = ref({ list: [], parent: "" });
+const data = ref<{
+  list: { name: string; path: string; type: string }[];
+  parent: string;
+}>({
+  list: [],
+  parent: "",
+});
 
 const getData = async (path: string) => {
   const res = await common.fileSystem({
