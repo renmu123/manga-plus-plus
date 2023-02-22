@@ -10,13 +10,17 @@
     </div>
     <div class="right">
       <n-icon size="25" class="action-icon">
-        <FavoriteRound class="donate" @click="setting"></FavoriteRound>
+        <FavoriteRound
+          class="donate"
+          @click="donateVisible = true"
+        ></FavoriteRound>
       </n-icon>
       <n-icon size="25" class="action-icon">
         <SettingsRound class="setting" @click="setting"></SettingsRound>
       </n-icon>
     </div>
   </div>
+  <donateDialog v-model:visible="donateVisible"></donateDialog>
 </template>
 
 <script setup lang="ts">
@@ -26,6 +30,7 @@ import {
   SettingsRound,
   FavoriteRound,
 } from "@vicons/material";
+import donateDialog from "./donateDialog.vue";
 
 const router = useRouter();
 
@@ -38,6 +43,8 @@ const back = () => {
 const setting = () => {
   router.push({ name: "setting" });
 };
+
+const donateVisible = ref(false);
 </script>
 
 <style scoped lang="scss">
