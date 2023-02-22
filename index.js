@@ -21,7 +21,7 @@ import configRouter from "./src/routes/config.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const hostname = "localhost";
+const hostname = "0.0.0.0";
 const port = 3000;
 
 const app = express();
@@ -29,13 +29,13 @@ app.use(cors({ exposedHeaders: ["Content-Disposition"] }));
 app.use(express.json());
 app.use(fileUpload());
 
-app.use("/comic", comicRouter);
-app.use("/author", authorRouter);
-app.use("/chapter", chapterRouter);
-app.use("/tag", tagRouter);
-app.use("/library", libraryRouter);
-app.use("/common", commonRouter);
-app.use("/config", configRouter);
+app.use("/api/comic", comicRouter);
+app.use("/api/author", authorRouter);
+app.use("/api/chapter", chapterRouter);
+app.use("/api/tag", tagRouter);
+app.use("/api/library", libraryRouter);
+app.use("/api/common", commonRouter);
+app.use("/api/config", configRouter);
 
 app.use(
   expressWinston.errorLogger({

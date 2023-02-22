@@ -1,29 +1,31 @@
 <template>
   <div class="action-header">
     <div class="left">
-      <n-icon size="25">
-        <HomeFilled class="home action-icon" @click="home"></HomeFilled>
+      <n-icon size="25" class="action-icon">
+        <ArrowBackFilled class="back" @click="back"></ArrowBackFilled>
       </n-icon>
-      <n-icon size="25">
-        <ArrowBackFilled
-          class="back action-icon"
-          @click="back"
-        ></ArrowBackFilled>
+      <n-icon size="25" class="action-icon">
+        <HomeFilled class="home" @click="home"></HomeFilled>
       </n-icon>
     </div>
     <div class="right">
-      <n-icon size="25">
-        <SettingsRound
-          class="setting action-icon"
-          @click="setting"
-        ></SettingsRound>
+      <n-icon size="25" class="action-icon">
+        <FavoriteRound class="donate" @click="setting"></FavoriteRound>
+      </n-icon>
+      <n-icon size="25" class="action-icon">
+        <SettingsRound class="setting" @click="setting"></SettingsRound>
       </n-icon>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { HomeFilled, ArrowBackFilled, SettingsRound } from "@vicons/material";
+import {
+  HomeFilled,
+  ArrowBackFilled,
+  SettingsRound,
+  FavoriteRound,
+} from "@vicons/material";
 
 const router = useRouter();
 
@@ -46,6 +48,7 @@ const setting = () => {
 
   .action-icon {
     cursor: pointer;
+    margin: 0px 5px;
   }
   .home {
   }
@@ -53,6 +56,9 @@ const setting = () => {
   }
   .right {
     margin-left: auto;
+  }
+  .donate {
+    color: red;
   }
   .setting {
   }

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon server.js",
+    "start": "nodemon index.js",
     "db:migrate": "npx prisma migrate dev --schema ./src/prisma/schema.prisma",
     "db:push": "npx prisma db push --schema ./src/prisma/schema.prisma",
     "db:studio": "npx prisma studio --schema ./src/prisma/schema.prisma"

@@ -247,7 +247,7 @@ const getContentType = (name) => {
 
 const getCover = (name) => {
   const { base } = path.parse(name);
-  return `http://localhost:3000/common/cover/${base}`;
+  return `http://localhost:3000/api/common/cover/${base}`;
 };
 
 export {

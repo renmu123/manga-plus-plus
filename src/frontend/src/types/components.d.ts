@@ -10,6 +10,7 @@ declare module '@vue/runtime-core' {
     ActionHeader: typeof import('./../components/actionHeader.vue')['default']
     ChapterCard: typeof import('./../components/chapterCard.vue')['default']
     ComicCard: typeof import('./../components/comicCard.vue')['default']
+    DonateDialog: typeof import('./../components/donateDialog.vue')['default']
     FileBrowser: typeof import("./../components/fileBrowser/index.vue")["default"]
     FileBrowserDialog: typeof import('./../components/fileBrowserDialog/index.vue')['default']
     HelloWorld: typeof import("./../components/HelloWorld.vue")["default"]
