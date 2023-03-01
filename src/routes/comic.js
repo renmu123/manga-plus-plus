@@ -42,6 +42,10 @@ router.post(
     const post = prisma.comic.delete({
       where: { id },
     });
+    if (!post) {
+      throw new Error("id不存在");
+    }
+
     fs.removeSync(post.dir);
 
     res.json({ success: true });
@@ -125,6 +129,9 @@ router.get(
       filter,
       orderBy
     );
+    if (!post) {
+      throw new Error("libraryId不存在");
+    }
 
     posts = posts.map((item) => {
       if (item.cover) {

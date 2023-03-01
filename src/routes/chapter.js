@@ -31,6 +31,10 @@ router.post(
   async (req, res) => {
     const { id } = req.body;
     const post = await chapter.removeChapter(id);
+    if (!post) {
+      throw new Error("id不存在");
+    }
+
     fs.removeSync(post.dir);
 
     res.json(post);
@@ -43,6 +47,9 @@ router.post(
   async (req, res) => {
     const { id } = req.body;
     const post = await chapter.getChapter(id);
+    if (!post) {
+      throw new Error("id不存在");
+    }
 
     if (post.type === "file") {
       res.download(post.dir);
@@ -116,6 +123,9 @@ router.get(
     const start = req.query.start;
 
     const post = await chapter.getChapter(req.params.id);
+    if (!post) {
+      throw new Error("id不存在");
+    }
     let imageFiles = [];
 
     if (post.type === "folder") {
@@ -125,7 +135,7 @@ router.get(
     }
     let data = imageFiles.slice(start, start + req.query.offset);
     data = data.map((name) => {
-      return `//localhost:3000/chapter/query/${req.params.id}/image/${name}`;
+      return `//localhost:3000/api/chapter/query/${req.params.id}/image/${name}`;
     });
     res.json({
       data: data,
@@ -143,6 +153,9 @@ router.get(
   async (req, res) => {
     const imageName = req.params.imageName;
     const post = await chapter.getChapter(req.params.id);
+    if (!post) {
+      throw new Error("id不存在");
+    }
 
     if (post.type === "folder") {
       const imagePath = path.join(post.dir, imageName);
